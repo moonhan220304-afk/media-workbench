@@ -1,0 +1,1826 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>自媒体工作台 · 内容生产 v2</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='%2322d3ee'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23050a18'/%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   自媒体工作台 v2 · Design Token 注册处（唯一允许颜色/字号/间距字面量的位置）
+   规则（AGENTS.md / Constitution II）：token 定义处之外禁止硬编码
+============================================================ */
+:root{
+  /* ---- 表面与文字 ---- */
+  --bg:#050a18;
+  --panel:rgba(14,24,42,.72);
+  --panel-2:rgba(20,32,56,.85);
+  --panel-glass:rgba(8,14,28,.92);
+  --panel-deep:rgba(5,10,24,.7);
+  --ink:#e6f2ff; --muted:#8ba3c7; --soft:#54688a; --bright:#ffffff;
+  --line:rgba(139,163,199,.14); --line-2:rgba(139,163,199,.28);
+  --dim-wash:rgba(230,237,247,.025);
+  --hover-wash:rgba(34,211,238,.04);
+  --accent-wash:rgba(34,211,238,.08);
+  --accent-wash-2:rgba(34,211,238,.12);
+  --on-accent:#04101f;
+
+  /* ---- 语义色 ---- */
+  --cy:#22d3ee; --pu:#a78bfa; --ok:#34d399; --warn:#fbbf24; --bad:#f87171; --link:#5b9dff;
+
+  /* ---- 状态色（PRD §4 状态机）---- */
+  --st-wait:#94a3bd; --st-accepted:#5b9dff; --st-script:#fbbf24;
+  --st-approval:#c084fc; --st-making:#fb923c; --st-published:#34d399; --st-shelved:#64708a;
+
+  /* ---- 账号色 ---- */
+  --ac-gs:#22d3ee; --ac-rzdy:#5b9dff; --ac-rzxhs:#c084fc;
+
+  /* ---- 渐变 / 光晕 / 阴影（均登记为 token）---- */
+  --grad-orb:radial-gradient(circle at 35% 35%,#7ff3ff,#22d3ee 45%,#0b3a4a);
+  --grad-accent:linear-gradient(135deg,#22d3ee,#5b9dff);
+  --grad-track:linear-gradient(90deg,rgba(34,211,238,.15),rgba(34,211,238,.7),rgba(167,139,250,.7),rgba(52,211,153,.6));
+  --glow-bg:radial-gradient(1000px 500px at 50% -20%,rgba(34,211,238,.10),transparent 60%),
+           radial-gradient(800px 500px at 95% 120%,rgba(167,139,250,.08),transparent 60%);
+  --glow-orb:0 0 14px rgba(34,211,238,.5);
+  --glow-orb-hi:0 0 26px rgba(34,211,238,.9);
+  --glow-track:0 0 18px rgba(34,211,238,.35);
+  --glow-node:0 0 14px var(--sc,var(--cy));
+  --glow-cur:0 0 10px rgba(34,211,238,.6);
+  --glow-nav:0 0 14px rgba(34,211,238,.25);
+  --glow-btn:0 0 16px rgba(34,211,238,.4);
+  --glow-chip:0 0 12px color-mix(in srgb,var(--fc,var(--cy)) 28%,transparent);
+  --glow-pod:0 6px 22px color-mix(in srgb,var(--sc,var(--cy)) 28%,transparent);
+  --glow-flash:0 0 26px rgba(251,191,36,.8);
+  --shadow-toast:0 8px 30px rgba(0,0,0,.5);
+  --shadow-modal:0 18px 60px rgba(0,0,0,.55);
+  --shadow-island:0 18px 50px rgba(0,0,0,.5), 0 0 0 1px rgba(139,163,199,.05);
+  --shadow-pop:0 4px 20px rgba(34,211,238,.12);
+  --inset-cal:inset 0 0 14px rgba(34,211,238,.1);
+
+  /* ---- 描边 / 薄涂（半透明变体，登记后经 var 引用）---- */
+  --cy-line:rgba(34,211,238,.3); --cy-line-2:rgba(34,211,238,.45); --cy-line-soft:rgba(34,211,238,.25);
+  --ok-line:rgba(52,211,153,.4); --bad-line:rgba(248,113,113,.4); --bad-wash:rgba(248,113,113,.08);
+  --warn-line:rgba(251,191,36,.3); --warn-line-2:rgba(251,191,36,.45); --warn-wash:rgba(251,191,36,.1);
+  --link-line:rgba(91,157,255,.4);
+
+  /* ---- 字号阶 ---- */
+  --font-base:-apple-system,"PingFang SC","Segoe UI",Roboto,sans-serif;
+  --font-brand:Orbitron,var(--font-base);
+  --font-mono:Orbitron,monospace;
+  --fs-2xs:9px; --fs-xs:11px; --fs-sm:12.5px; --fs-md:13px; --fs-lg:14px;
+  --fs-xl:16px; --fs-h2:17px; --fs-2xl:19px; --fs-num:29px;
+
+  /* ---- 间距阶（2/4/8/12/16/20/24/28/32/40）---- */
+  --sp-1:2px; --sp-2:4px; --sp-3:8px; --sp-4:12px; --sp-5:16px;
+  --sp-6:20px; --sp-7:24px; --sp-8:28px; --sp-9:32px; --sp-10:40px;
+
+  /* ---- 圆角 ---- */
+  --r-sm:6px; --r-md:10px; --r-lg:14px; --r-pill:99px; --r-xl:24px;
+
+  /* ---- 星轨布局定位（结构性位置 token）---- */
+  --track-top:44px; --shuttle-top:39px; --node-top:34px;
+  --cnt-top:64px; --numtag-top:-14px;
+  --drawer-w:212px; --drawer-off:12px; --mtabs-h:76px;
+  --station-w:120px; --station-w-m:56px; --node-top-m:25px;
+  --mask-bg:rgba(3,6,14,.6);
+  --pods-gap:13px;
+}
+/* ============ token 注册结束，以下全部只引用 var() ============ */
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-base);background:var(--bg);color:var(--ink);
+  min-height:100vh;overflow-x:hidden;line-height:1.6}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;background:var(--glow-bg)}
+#stars{position:fixed;inset:0;z-index:0}
+::-webkit-scrollbar{width:var(--sp-3);height:var(--sp-3)}
+::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:var(--r-sm)}
+::-webkit-scrollbar-track{background:transparent}
+button{font-family:inherit;cursor:pointer}
+input,select,textarea{font-family:inherit;font-size:var(--fs-sm);color:var(--ink);
+  background:var(--panel-deep);border:1px solid var(--line-2);border-radius:var(--r-sm);
+  padding:var(--sp-3) var(--sp-3);outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--cy)}
+select option{background:var(--panel-2)}
+a{color:var(--link)}
+.app{position:relative;z-index:2;max-width:1440px;margin:0 auto;padding:0 var(--sp-8) var(--sp-10)}
+
+/* ===== 顶栏 ===== */
+header{display:flex;align-items:center;gap:var(--sp-4);padding:var(--sp-6) 0 0;flex-wrap:wrap}
+.logo{font-family:var(--font-brand);font-size:var(--fs-2xl);letter-spacing:.08em;
+  display:flex;align-items:center;gap:var(--sp-3);white-space:nowrap}
+.logo .orb{width:30px;height:30px;border-radius:50%;background:var(--grad-orb);
+  box-shadow:var(--glow-orb);animation:orb 4s ease-in-out infinite}
+@keyframes orb{0%,100%{box-shadow:var(--glow-orb)}50%{box-shadow:var(--glow-orb-hi)}}
+.logo em{font-style:normal;color:var(--cy);text-shadow:0 0 14px var(--cy-line-2)}
+.acct{font-size:var(--fs-xs);color:var(--muted);border:1px solid var(--line-2);
+  border-radius:var(--r-pill);padding:var(--sp-2) var(--sp-3);white-space:nowrap}
+/* ===== 悬停导航浮岛（桌面）+ 底部 Tab（移动）===== */
+#edgezone{position:fixed;left:0;top:0;bottom:0;width:16px;z-index:45}
+#drawer-nav{position:fixed;left:var(--drawer-off);top:50%;bottom:auto;width:var(--drawer-w);z-index:46;
+  border-radius:var(--r-xl);border:1px solid var(--cy-line-soft);
+  background:var(--panel-glass);backdrop-filter:blur(22px);
+  box-shadow:var(--shadow-island);
+  transform:translateY(-50%) translateX(calc(-100% - 24px));opacity:0;pointer-events:none;
+  transition:transform .3s cubic-bezier(.2,.9,.3,1),opacity .22s ease;
+  display:flex;flex-direction:column;gap:var(--sp-1);padding:var(--sp-3)}
+body.nav-open #drawer-nav,body.nav-pin #drawer-nav{transform:translateY(-50%);opacity:1;pointer-events:auto}
+body.nav-pin .app{padding-left:calc(var(--drawer-w) + var(--drawer-off) + var(--sp-6))}
+.dn-cap{width:34px;height:4px;border-radius:var(--r-pill);background:var(--line-2);margin:0 auto var(--sp-2)}
+.dn-item{position:relative;display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-2);
+  border-radius:var(--r-lg);background:none;border:none;color:var(--muted);
+  font-size:var(--fs-md);text-align:left;transition:.18s;width:100%}
+.dn-item .ic{width:34px;height:34px;border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;
+  background:var(--dim-wash);flex:none;transition:.18s}
+.dn-item:hover{color:var(--ink)}
+.dn-item:hover .ic{background:var(--accent-wash);box-shadow:var(--glow-nav);transform:translateY(-1px)}
+.dn-item.on{color:var(--ink)}
+.dn-item.on::after{content:"";position:absolute;left:calc(-1 * var(--sp-1));top:50%;width:3px;height:18px;
+  border-radius:var(--r-pill);background:var(--cy);box-shadow:var(--glow-cur);transform:translateY(-50%)}
+.dn-item.on .ic{background:var(--grad-accent);box-shadow:var(--glow-cur)}
+.dn-foot{margin-top:var(--sp-2)}
+#pin-btn{width:100%}
+#mtabs{display:none}
+.wk-fold{margin-bottom:var(--sp-2)}
+.wk-fold summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:var(--sp-2);
+  font-size:var(--fs-lg);color:var(--cy);font-weight:600;padding:var(--sp-2) 0}
+.wk-fold summary::-webkit-details-marker{display:none}
+.wk-fold summary .tg{color:var(--soft);font-size:var(--fs-xs)}
+.wk-fold summary::after{content:"▾";color:var(--soft);margin-left:auto}
+.wk-fold:not([open]) summary::after{content:"▸"}
+@media (min-width:1150px){.duo{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-4);align-items:stretch}}
+.duo .panel{display:flex;flex-direction:column}
+.duo .panel .insight{margin-top:auto;padding-top:var(--sp-3);border-top:1px dashed var(--line);border-bottom:none}
+.clock{font-family:var(--font-mono);font-size:var(--fs-xs);color:var(--soft);letter-spacing:.1em;white-space:nowrap}
+.btn{padding:var(--sp-3) var(--sp-5);border-radius:var(--r-pill);border:1px solid var(--cy-line-2);
+  background:var(--accent-wash);color:var(--cy);font-size:var(--fs-md);transition:.2s;white-space:nowrap}
+.btn:hover{box-shadow:var(--glow-btn);transform:translateY(-1px)}
+.btn.solid{background:var(--grad-accent);color:var(--on-accent);font-weight:700;border:none}
+.btn.solid:hover{filter:brightness(1.08)}
+.btn.sm{padding:var(--sp-2) var(--sp-3);font-size:var(--fs-sm)}
+.btn.ghost{background:transparent;border-color:var(--line-2);color:var(--muted)}
+.btn.ghost:hover{color:var(--cy);border-color:var(--cy-line)}
+.btn.danger:hover{color:var(--bad);border-color:var(--bad-line)}
+#search{width:210px}
+
+/* ===== KPI 数据带（L1）===== */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--sp-4);margin:var(--sp-6) 0 var(--sp-2)}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-lg);
+  padding:var(--sp-5) var(--sp-6);backdrop-filter:blur(10px);position:relative;
+  overflow:hidden;animation:rise .6s both}
+.kpi:nth-child(2){animation-delay:.08s}.kpi:nth-child(3){animation-delay:.16s}.kpi:nth-child(4){animation-delay:.24s}
+.kpi::after{content:"";position:absolute;top:0;left:0;right:0;height:var(--sp-1);
+  background:linear-gradient(90deg,transparent,var(--ac,var(--cy)),transparent)}
+.kpi .lab{font-size:var(--fs-sm);color:var(--muted)}
+.kpi .num{font-family:var(--font-mono);font-size:var(--fs-num);font-weight:700;margin-top:var(--sp-1);color:var(--ac,var(--cy))}
+.kpi .sub{font-size:var(--fs-xs);color:var(--soft);margin-top:var(--sp-1)}
+
+/* ===== 星轨轨道（L2）===== */
+.track-zone{position:relative;margin:var(--sp-8) var(--sp-3) 0;height:118px}
+.track{position:absolute;top:var(--track-top);left:3%;right:3%;height:3px;border-radius:var(--sp-1);
+  background:var(--grad-track);box-shadow:var(--glow-track)}
+.shuttle{position:absolute;top:var(--shuttle-top);width:13px;height:13px;border-radius:50%;
+  background:var(--bright);box-shadow:var(--glow-track);animation:travel 10s ease-in-out infinite alternate;z-index:3}
+@keyframes travel{from{left:3%}to{left:calc(97% - 13px)}}
+.station{position:absolute;top:0;width:var(--station-w);margin-left:calc(var(--station-w) / -2);text-align:center;z-index:2}
+.station .node{width:22px;height:22px;margin:var(--node-top) auto 0;border-radius:50%;
+  border:2px solid var(--sc);background:var(--bg);box-shadow:var(--glow-node);transition:.25s;position:relative}
+.station:hover .node{transform:scale(1.3)}
+.station .node::after{content:"";position:absolute;inset:5px;border-radius:50%;
+  background:var(--sc);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.station .name{font-size:var(--fs-md);font-weight:600;position:absolute;top:0;left:0;right:0;color:var(--sc)}
+.station .cnt{font-family:var(--font-mono);font-size:var(--fs-2xs);color:var(--soft);
+  position:absolute;top:var(--cnt-top);left:0;right:0}
+.station .num-tag{font-family:var(--font-mono);font-size:var(--fs-2xs);color:var(--soft);
+  letter-spacing:.2em;position:absolute;top:var(--numtag-top);left:0;right:0}
+
+/* ===== 舱体 ===== */
+.pods{display:grid;grid-template-columns:repeat(6,1fr);gap:var(--pods-gap);padding:var(--sp-2) 0 var(--sp-3)}
+.pod-col{display:flex;flex-direction:column;gap:var(--sp-3);min-width:0}
+.pod{background:var(--panel-2);border:1px solid var(--line);border-left:3px solid var(--sc,var(--cy));
+  border-radius:var(--r-md);padding:var(--sp-4);backdrop-filter:blur(8px);
+  transition:.22s;animation:drop .55s both;position:relative}
+.pod:hover{transform:translateY(-3px);border-color:var(--sc,var(--cy));box-shadow:var(--glow-pod)}
+.pod .t{font-size:var(--fs-sm);font-weight:600;line-height:1.45}
+.pod .m{display:flex;gap:var(--sp-2);margin-top:var(--sp-3);flex-wrap:wrap}
+@keyframes drop{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:none}}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.empty-col{font-size:var(--fs-xs);color:var(--soft);text-align:center;padding:var(--sp-3) 0}
+
+/* ===== 标签 ===== */
+.tag{font-size:var(--fs-xs);padding:var(--sp-1) var(--sp-3);border-radius:var(--r-pill);
+  border:1px solid var(--cy-line);color:var(--cy);white-space:nowrap}
+.tag.dim{color:var(--muted);border-color:var(--line)}
+.tag.ok{color:var(--ok);border-color:var(--ok-line)}
+.tag.bad{color:var(--bad);border-color:var(--bad-line)}
+.tag.pend-tag{color:var(--warn);border-color:var(--warn-line-2);background:var(--warn-wash)}
+.tag.acct-tag{border-color:var(--line)}
+
+/* ===== 通用面板 / 视图头 ===== */
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-lg);
+  backdrop-filter:blur(10px);padding:var(--sp-5) var(--sp-6);animation:rise .5s both}
+.view{animation:fadev .35s ease}
+@keyframes fadev{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.vhead{display:flex;align-items:center;gap:var(--sp-3);margin:var(--sp-6) 0 var(--sp-4);flex-wrap:wrap}
+.vhead h2{font-size:var(--fs-h2);font-weight:700}
+.vhead h2::before{content:"◈ ";color:var(--cy)}
+.pipe-head{display:flex;align-items:center;gap:var(--sp-3);margin:var(--sp-5) 0 var(--sp-2);flex-wrap:wrap}
+.lab{font-size:var(--fs-sm);color:var(--soft)}
+.hint{font-size:var(--fs-xs);color:var(--soft)}
+.flex1{flex:1}
+.sub-h{font-size:var(--fs-lg);margin:var(--sp-5) 0 var(--sp-3);color:var(--cy);font-weight:600}
+.sub-h::before{content:"▎"}
+.col-h{font-size:var(--fs-lg);margin:var(--sp-6) 0 var(--sp-3);color:var(--cy);font-weight:600;
+  display:flex;align-items:center;gap:var(--sp-2);flex-wrap:wrap}
+.col-h::before{content:"▎"}
+.nowrap{white-space:nowrap}
+
+/* ===== seg 切换 ===== */
+.seg{display:inline-flex;background:var(--panel);border:1px solid var(--line-2);
+  border-radius:var(--r-pill);padding:var(--sp-1)}
+.seg button{border:none;background:none;color:var(--muted);font-size:var(--fs-sm);
+  padding:var(--sp-2) var(--sp-3);border-radius:var(--r-pill)}
+.seg button.on{background:var(--accent-wash);color:var(--cy)}
+
+/* ===== 平台筛选芯片 ===== */
+.fbar{display:inline-flex;gap:var(--sp-2);flex-wrap:wrap;align-items:center}
+.fchip{padding:var(--sp-2) var(--sp-3);border-radius:var(--r-pill);border:1px solid var(--line-2);
+  background:var(--panel);color:var(--muted);font-size:var(--fs-sm);transition:.2s;
+  display:inline-flex;align-items:center;gap:var(--sp-2)}
+.fchip .dot{width:7px;height:7px;border-radius:50%;background:var(--fc,var(--muted));flex:none}
+.fchip:hover{color:var(--fc,var(--cy));border-color:var(--fc,var(--cy))}
+.fchip.on{color:var(--fc,var(--cy));border-color:var(--fc,var(--cy));
+  background:color-mix(in srgb,var(--fc,var(--cy)) 12%,transparent);box-shadow:var(--glow-chip)}
+
+/* ===== 表格 ===== */
+.tbl{width:100%;border-collapse:collapse;font-size:var(--fs-md)}
+.tbl th{text-align:left;font-size:var(--fs-xs);color:var(--soft);font-weight:500;
+  padding:var(--sp-3) var(--sp-4);border-bottom:1px solid var(--line-2);letter-spacing:.05em}
+.tbl td{padding:var(--sp-3) var(--sp-4);border-bottom:1px solid var(--line);vertical-align:middle}
+.tbl tr:hover td{background:var(--hover-wash)}
+.table-panel{padding:0;overflow:auto}
+.td-title{max-width:300px}
+.pill{font-size:var(--fs-xs);padding:var(--sp-1) var(--sp-3);border-radius:var(--r-pill);
+  border:1px solid var(--line-2);white-space:nowrap}
+.empty-cell{color:var(--soft);text-align:center;padding:var(--sp-9) 0;font-size:var(--fs-md)}
+.empty-panel{text-align:center;color:var(--soft);padding:var(--sp-10) 0;margin-top:var(--sp-5);font-size:var(--fs-md)}
+
+/* ===== 选题周报 ===== */
+.wk-item{background:var(--panel-2);border:1px solid var(--line);border-radius:var(--r-md);
+  padding:var(--sp-5) var(--sp-6);margin-bottom:var(--sp-3);transition:.2s;animation:rise .5s both}
+.wk-item:hover{border-color:var(--cy-line-2);box-shadow:var(--shadow-pop)}
+.wk-item.handled{opacity:.55}
+.wk-title{font-size:var(--fs-lg);font-weight:650;display:flex;gap:var(--sp-3);align-items:center;flex-wrap:wrap}
+.wk-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-3) var(--sp-6);margin:var(--sp-3) 0}
+.wk-b .lab{font-size:var(--fs-xs);color:var(--soft);letter-spacing:.08em;margin-bottom:var(--sp-1)}
+.wk-b .val{font-size:var(--fs-sm)}
+.wk-act{display:flex;gap:var(--sp-2);border-top:1px solid var(--line);padding-top:var(--sp-3);flex-wrap:wrap}
+.hist{margin-bottom:var(--sp-2)}
+.hist summary{cursor:pointer;font-size:var(--fs-md);color:var(--muted)}
+.hist summary:hover{color:var(--cy)}
+.hist-body{margin-top:var(--sp-4)}
+
+/* ===== 排期日历 ===== */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:var(--sp-2)}
+.cal-dow{font-size:var(--fs-xs);color:var(--soft);text-align:center;padding:var(--sp-2) 0}
+.cal-cell{min-height:88px;background:var(--dim-wash);border:1px solid var(--line);
+  border-radius:var(--r-sm);padding:var(--sp-2);transition:.2s}
+.cal-cell:hover{border-color:var(--cy-line-2)}
+.cal-cell.dim{opacity:.3}
+.cal-cell .d{font-size:var(--fs-xs);color:var(--soft);margin-bottom:var(--sp-2)}
+.chip{font-size:var(--fs-xs);padding:var(--sp-1) var(--sp-3);border-radius:var(--r-sm);
+  margin-bottom:var(--sp-1);display:block;white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis;border:1px solid transparent;transition:.18s}
+.chip:hover{border-color:var(--cy)}
+.chip.pend{background:var(--warn-wash);color:var(--warn);border-color:var(--warn-line);cursor:pointer}
+.chip.pend:hover{border-color:var(--warn-line-2)}
+.dim-txt{opacity:.65}
+.pend-panel{margin-bottom:var(--sp-4)}
+.pend-panel h4{font-size:var(--fs-xs);color:var(--soft);letter-spacing:.1em;margin-bottom:var(--sp-3)}
+.pend-list{display:flex;gap:var(--sp-2);flex-wrap:wrap}
+.pend-list .chip{display:inline-flex;margin:0}
+
+/* ===== 抽屉 ===== */
+#drawer-mask{position:fixed;inset:0;background:var(--mask-bg);opacity:0;pointer-events:none;transition:.25s;z-index:40}
+#drawer-mask.open{opacity:1;pointer-events:auto}
+#drawer{position:fixed;top:0;right:0;bottom:0;width:460px;max-width:92vw;z-index:41;
+  background:var(--panel-glass);border-left:1px solid var(--cy-line-2);backdrop-filter:blur(18px);
+  transform:translateX(100%);transition:transform .3s cubic-bezier(.2,.9,.3,1);
+  overflow-y:auto;padding:var(--sp-6)}
+#drawer.open{transform:none}
+.drawer-head{display:flex;align-items:center;gap:var(--sp-3)}
+.drawer-head strong{font-size:var(--fs-lg)}
+.steps{display:flex;margin:var(--sp-5) 0 var(--sp-1)}
+.step{flex:1;text-align:center;position:relative}
+.step .n{width:20px;height:20px;border-radius:50%;margin:0 auto var(--sp-2);display:flex;
+  align-items:center;justify-content:center;font-size:var(--fs-2xs);background:var(--panel-2);
+  border:1px solid var(--line-2);color:var(--soft);position:relative;z-index:2}
+.step .s{font-size:var(--fs-2xs);color:var(--soft)}
+.step::before{content:"";position:absolute;top:10px;left:-50%;width:100%;height:1.5px;
+  background:var(--line-2);z-index:1}
+.step:first-child::before{display:none}
+.step.done .n{border-color:var(--ok);color:var(--ok)}
+.step.done::before{background:var(--ok)}
+.step.cur .n{background:var(--cy);border-color:var(--cy);color:var(--on-accent);
+  font-weight:700;box-shadow:var(--glow-cur)}
+.step.cur .s{color:var(--cy);font-weight:600}
+.sec{border:1px solid var(--line);border-radius:var(--r-md);padding:var(--sp-4) var(--sp-5);margin-top:var(--sp-3)}
+.sec>h4{font-size:var(--fs-xs);color:var(--soft);letter-spacing:.1em;margin-bottom:var(--sp-3)}
+.appr-node{border:1px solid var(--line-2);border-radius:var(--r-sm);padding:var(--sp-3) var(--sp-4);margin-bottom:var(--sp-2)}
+.appr-node.pass{border-color:var(--ok-line)}
+.appr-node.fail{border-color:var(--bad-line)}
+.appr-node.pending{border-color:var(--cy-line-2);background:var(--accent-wash)}
+.appr-row{display:flex;align-items:center;gap:var(--sp-2)}
+.appr-row .who{font-size:var(--fs-md);flex:1}
+.appr-cmt{font-size:var(--fs-sm);color:var(--muted);margin-top:var(--sp-2)}
+.log-item{display:flex;gap:var(--sp-3);padding:var(--sp-2) 0;border-bottom:1px dashed var(--line);font-size:var(--fs-sm)}
+.log-item:last-child{border-bottom:none}
+.log-item .time{color:var(--soft);flex:none;width:118px;font-size:var(--fs-xs)}
+.link-row{display:flex;gap:var(--sp-2);align-items:center;padding:var(--sp-2) 0;
+  border-bottom:1px dashed var(--line)}
+.link-row a{font-size:var(--fs-sm);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kv{display:grid;grid-template-columns:88px 1fr;gap:var(--sp-2) var(--sp-3);font-size:var(--fs-sm)}
+.kv .k{color:var(--soft)}
+details.snap summary{cursor:pointer;font-size:var(--fs-sm);color:var(--muted)}
+details.snap[open] summary{margin-bottom:var(--sp-2);color:var(--cy)}
+.field{margin-bottom:var(--sp-4)}
+.field label{display:block;font-size:var(--fs-sm);color:var(--muted);margin-bottom:var(--sp-2)}
+.field input,.field select,.field textarea{width:100%}
+.row{display:flex;gap:var(--sp-3);align-items:center}
+.tbd{display:flex;gap:var(--sp-2);align-items:center;font-size:var(--fs-sm);
+  color:var(--muted);white-space:nowrap}
+.tbd input{width:auto}
+
+/* ===== 弹窗 ===== */
+.modal-mask{position:fixed;inset:0;background:var(--mask-bg);display:none;
+  align-items:center;justify-content:center;z-index:50}
+.modal-mask.open{display:flex}
+.modal{background:var(--panel-glass);border:1px solid var(--cy-line-2);backdrop-filter:blur(18px);
+  border-radius:var(--r-lg);padding:var(--sp-6);width:560px;max-width:94vw;max-height:86vh;
+  overflow-y:auto;box-shadow:var(--shadow-modal);animation:rise .3s both}
+.modal h3{font-size:var(--fs-xl);margin-bottom:var(--sp-5);display:flex;align-items:center;gap:var(--sp-2)}
+.modal-actions{display:flex;gap:var(--sp-3);justify-content:flex-end;margin-top:var(--sp-5)}
+.adopt-title{font-size:var(--fs-lg);font-weight:650;line-height:1.5}
+.rep-list{max-height:320px;overflow-y:auto;border:1px solid var(--line);border-radius:var(--r-md);padding:var(--sp-3)}
+.rep-item{display:flex;gap:var(--sp-3);align-items:center;padding:var(--sp-2) var(--sp-3);
+  border-radius:var(--r-sm);font-size:var(--fs-sm)}
+.rep-item:hover{background:var(--hover-wash)}
+.rep-item .rt{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rep-item input{width:auto}
+
+/* ===== Toast ===== */
+#toasts{position:fixed;bottom:22px;right:22px;z-index:99;display:flex;flex-direction:column;gap:var(--sp-3)}
+.toast{background:var(--panel-2);border:1px solid var(--cy-line-2);border-left:3px solid var(--cy);
+  border-radius:var(--r-md);padding:var(--sp-4) var(--sp-5);font-size:var(--fs-md);
+  max-width:380px;box-shadow:var(--shadow-toast);animation:tin .25s ease}
+.toast.warn{border-color:var(--bad-line);border-left-color:var(--bad)}
+@keyframes tin{from{transform:translateX(30px);opacity:0}to{transform:none;opacity:1}}
+
+/* ===== 待定跳转高亮 ===== */
+.pod.flash{animation:flash 1.4s ease 2;border-color:var(--warn)}
+@keyframes flash{0%,100%{box-shadow:0 0 0 transparent}
+  50%{box-shadow:var(--glow-flash);border-color:var(--warn);transform:translateY(-3px)}}
+
+/* ===== 客户汇报页（hash 路由只读页）===== */
+body.client-mode header,body.client-mode #drawer-nav,body.client-mode #edgezone,body.client-mode #nav-trigger{display:none}
+.client{max-width:1100px;margin:0 auto;padding:var(--sp-8) 0 var(--sp-10)}
+.client-head{display:flex;align-items:flex-start;gap:var(--sp-4);margin-bottom:var(--sp-6)}
+.c-brand{font-family:var(--font-brand);font-size:var(--fs-2xl);letter-spacing:.06em}
+.c-item{padding:var(--sp-3) 0;border-bottom:1px dashed var(--line)}
+.c-item:last-child{border-bottom:none}
+.c-item .hint{margin-top:var(--sp-1)}
+.client-foot{text-align:center;color:var(--soft);font-size:var(--fs-sm);
+  padding:var(--sp-8) 0 var(--sp-5);letter-spacing:.1em}
+
+/* ===== 数据看板 ===== */
+.bar-row{display:flex;align-items:center;gap:var(--sp-3);margin-bottom:var(--sp-2)}
+.bar-lab{width:64px;flex:none;font-size:var(--fs-xs);color:var(--muted);text-align:right}
+.bar-track{flex:1;height:var(--sp-4);background:var(--dim-wash);border-radius:var(--r-sm);overflow:hidden}
+.bar-fill{height:100%;border-radius:var(--r-sm);background:var(--link)}
+.bar-fill.hot{background:var(--cy)}
+.bar-fill.rate{background:var(--ok)}
+.bar-val{width:230px;flex:none;font-size:var(--fs-xs);color:var(--muted);font-family:var(--font-mono)}
+.insight{display:flex;gap:var(--sp-3);padding:var(--sp-2) 0;border-bottom:1px dashed var(--line);font-size:var(--fs-sm)}
+.insight:last-child{border-bottom:none}
+.insight .ic{color:var(--cy);flex:none}
+
+/* ===== 移动端 ===== */
+@media (max-width:960px){
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .pods{grid-template-columns:repeat(3,1fr)}
+  .station .num-tag{display:none}
+  #search{width:150px}
+}
+@media (max-width:640px){
+  .app{padding:0 var(--sp-4) var(--mtabs-h)}
+  header{gap:var(--sp-3);padding-top:var(--sp-4)}
+  #mtabs{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:47;
+    background:var(--panel-glass);border-top:1px solid var(--line-2);backdrop-filter:blur(18px);
+    padding:var(--sp-2) var(--sp-1) calc(var(--sp-2) + env(safe-area-inset-bottom))}
+  #mtabs button{flex:1;display:flex;flex-direction:column;align-items:center;gap:var(--sp-1);
+    background:none;border:none;color:var(--muted);font-size:var(--fs-2xs);padding:var(--sp-1) 0}
+  #mtabs button .ic{font-size:var(--fs-xl);line-height:1.2}
+  #mtabs button.on{color:var(--cy)}
+  body.client-mode #mtabs,body.client-mode #drawer-nav,body.client-mode #edgezone{display:none}
+  #edgezone,#drawer-nav,#nav-trigger{display:none!important}
+  .clock{display:none}
+  #search{width:100%;order:4}
+  .kpis{grid-template-columns:repeat(2,1fr);gap:var(--sp-3);margin-top:var(--sp-5)}
+  .kpi{padding:var(--sp-3) var(--sp-4)}
+  .kpi .num{font-size:var(--fs-h2)}
+  .track-zone{height:84px;margin:var(--sp-6) var(--sp-1) 0}
+  .track{top:32px}
+  .shuttle{display:none}
+  .station{--station-w:var(--station-w-m)}
+  .station .name{font-size:var(--fs-2xs)}
+  .station .node{width:15px;height:15px;margin-top:var(--node-top-m)}
+  .station .cnt{display:none}
+  .pods{grid-template-columns:1fr;gap:var(--sp-3)}
+  .pod-col{gap:var(--sp-2)}
+  .pod-col::before{content:"▎" attr(data-st);font-size:var(--fs-md);color:var(--sc);font-weight:700}
+  .wk-grid{grid-template-columns:1fr}
+  .cal-cell{min-height:60px;padding:var(--sp-1)}
+  .chip{font-size:var(--fs-2xs)}
+  .bar-lab{width:48px}
+  .bar-val{width:auto;max-width:150px;font-size:var(--fs-2xs)}
+  #drawer{width:100vw;max-width:100vw;padding:var(--sp-5)}
+  .vhead,.pipe-head{gap:var(--sp-2)}
+  .fbar{width:100%}
+  #toasts{left:14px;right:14px;bottom:14px}
+  .toast{max-width:none}
+}
+</style>
+</head>
+<body>
+<script>window.EMBEDDED_DEMO=true;window.EMBEDDED_STATE={"user": "江洋", "metrics": {"account": "rz_xhs", "source": "瑞众小红书近6个月笔记列表明细表.xlsx", "importedAt": 1788766463621, "rows": [{"t": "🎉2026瑞众保险开门大吉圆满收官", "date": "2026-03-12", "plays": 171, "likes": 5, "comments": 1, "shares": 5, "favors": 0, "note": "视频", "imp": 1676, "ctr": 0.0, "fans": 1, "watchSec": 6}, {"t": "今天植树节，和瑞众一起「浇」个朋友吧！", "date": "2026-03-12", "plays": 44, "likes": 2, "comments": 0, "shares": 0, "favors": 0, "note": "图文", "imp": 1043, "ctr": 0.0, "fans": 0, "watchSec": 5}, {"t": "💡 清朗金融网络，守护安心消费", "date": "2026-03-15", "plays": 105, "likes": 2, "comments": 0, "shares": 2, "favors": 1, "note": "视频", "imp": 1312, "ctr": 0.0, "fans": 2, "watchSec": 12}, {"t": "🔥瑞众这波西游海报也太会了", "date": "2026-03-16", "plays": 225, "likes": 13, "comments": 10, "shares": 15, "favors": 10, "note": "图文", "imp": 2338, "ctr": 0.0, "fans": 0, "watchSec": 3}, {"t": "🤔瑞众保险新编西游短剧太会吊胃口了", "date": "2026-03-16", "plays": 101, "likes": 10, "comments": 0, "shares": 3, "favors": 9, "note": "视频", "imp": 1194, "ctr": 0.0, "fans": 2, "watchSec": 32}, {"t": "🎬瑞众保险打造的治愈西游短剧来了", "date": "2026-03-17", "plays": 104, "likes": 13, "comments": 2, "shares": 4, "favors": 7, "note": "视频", "imp": 1200, "ctr": 0.0, "fans": 0, "watchSec": 21}, {"t": "保险百事通丨意外险，选长期还是短期？", "date": "2026-03-18", "plays": 111, "likes": 5, "comments": 2, "shares": 3, "favors": 2, "note": "视频", "imp": 1144, "ctr": 0.0, "fans": 1, "watchSec": 22}, {"t": "笑到停不下来的瑞众保险西游新编即将上线", "date": "2026-03-18", "plays": 74, "likes": 8, "comments": 0, "shares": 0, "favors": 5, "note": "视频", "imp": 1278, "ctr": 0.0, "fans": 0, "watchSec": 18}, {"t": "🎬瑞众保险西游短剧第一集", "date": "2026-03-19", "plays": 136, "likes": 13, "comments": 0, "shares": 3, "favors": 4, "note": "视频", "imp": 1658, "ctr": 0.0, "fans": 0, "watchSec": 18}, {"t": "🤔瑞众保险西游短剧第二集", "date": "2026-03-20", "plays": 87, "likes": 6, "comments": 0, "shares": 0, "favors": 3, "note": "视频", "imp": 1131, "ctr": 0.0, "fans": 2, "watchSec": 89}, {"t": "🤔瑞众保险西游短剧第三集", "date": "2026-03-23", "plays": 82, "likes": 7, "comments": 0, "shares": 0, "favors": 4, "note": "视频", "imp": 1162, "ctr": 0.0, "fans": 1, "watchSec": 144}, {"t": "☀️ 周启瑞时光☀️", "date": "2026-03-23", "plays": 65, "likes": 1, "comments": 1, "shares": 0, "favors": 0, "note": "视频", "imp": 1106, "ctr": 0.0, "fans": 0, "watchSec": 3}, {"t": "💪瑞众保险西游短剧第四集", "date": "2026-03-24", "plays": 123, "likes": 5, "comments": 0, "shares": 4, "favors": 3, "note": "视频", "imp": 1279, "ctr": 0.0, "fans": 0, "watchSec": 63}, {"t": "🎬瑞众保险西游短剧第五集暖心上线！", "date": "2026-03-25", "plays": 141, "likes": 5, "comments": 1, "shares": 0, "favors": 3, "note": "视频", "imp": 1396, "ctr": 0.0, "fans": 0, "watchSec": 66}, {"t": "🏡瑞众保险西游短剧圆满收官！最终章来了", "date": "2026-03-26", "plays": 114, "likes": 7, "comments": 1, "shares": 1, "favors": 5, "note": "视频", "imp": 1575, "ctr": 0.0, "fans": 0, "watchSec": 164}, {"t": "西行落幕，春启新章", "date": "2026-03-27", "plays": 157, "likes": 7, "comments": 0, "shares": 0, "favors": 4, "note": "图文", "imp": 3087, "ctr": 0.0, "fans": 1, "watchSec": 25}, {"t": "🦊 「雪山白狐X北京烤鸭」爆笑来袭！", "date": "2026-03-28", "plays": 521, "likes": 24, "comments": 1, "shares": 8, "favors": 7, "note": "视频", "imp": 2414, "ctr": 0.0, "fans": 4, "watchSec": 17}, {"t": "✨RUI时光｜新的一周，元气相伴！", "date": "2026-03-30", "plays": 100, "likes": 3, "comments": 0, "shares": 4, "favors": 2, "note": "视频", "imp": 1231, "ctr": 0.0, "fans": 0, "watchSec": 6}, {"t": "📢 瑞众保险2025投资成绩单发布！", "date": "2026-03-30", "plays": 247, "likes": 5, "comments": 0, "shares": 6, "favors": 1, "note": "视频", "imp": 2363, "ctr": 0.0, "fans": 3, "watchSec": 7}, {"t": "🎉致敬经典 共述美好", "date": "2026-03-31", "plays": 79, "likes": 2, "comments": 2, "shares": 0, "favors": 2, "note": "视频", "imp": 1228, "ctr": 0.0, "fans": 0, "watchSec": 18}, {"t": "2026环海南岛国际公路自行车赛即将火热开幕", "date": "2026-04-14", "plays": 249, "likes": 9, "comments": 1, "shares": 3, "favors": 2, "note": "视频", "imp": 1695, "ctr": 0.0, "fans": 1, "watchSec": 3}, {"t": "瑞众萌宠带您解锁「古诗里的春日浪漫」", "date": "2026-04-15", "plays": 64, "likes": 1, "comments": 1, "shares": 0, "favors": 2, "note": "视频", "imp": 991, "ctr": 0.0, "fans": 0, "watchSec": 7}, {"t": "💖和瑞众萌宠一起用色环打开春天", "date": "2026-04-21", "plays": 111, "likes": 4, "comments": 1, "shares": 2, "favors": 1, "note": "视频", "imp": 1042, "ctr": 0.0, "fans": 0, "watchSec": 5}, {"t": "保险是啥？童言无忌里藏的是真实的保险认知", "date": "2026-04-24", "plays": 5953, "likes": 68, "comments": 0, "shares": 22, "favors": 16, "note": "视频", "imp": 29320, "ctr": 0.0, "fans": 22, "watchSec": 33}, {"t": "❤️ 瑞众「赔」伴故事汇系列视频上线～", "date": "2026-04-29", "plays": 110, "likes": 2, "comments": 0, "shares": 5, "favors": 2, "note": "视频", "imp": 982, "ctr": 0.0, "fans": 0, "watchSec": 14}, {"t": "🏝️碧海椰风・逐梦海南，2026环岛赛", "date": "2026-04-30", "plays": 58, "likes": 1, "comments": 1, "shares": 0, "favors": 1, "note": "视频", "imp": 862, "ctr": 0.0, "fans": 0, "watchSec": 5}, {"t": "🎤五一特别企划「瑞众人请回答」", "date": "2026-04-30", "plays": 400, "likes": 3, "comments": 1, "shares": 2, "favors": 1, "note": "视频", "imp": 3060, "ctr": 0.0, "fans": 1, "watchSec": 48}, {"t": "🧐瑞众「清醒小课堂」金句频出", "date": "2026-05-06", "plays": 89, "likes": 1, "comments": 0, "shares": 0, "favors": 1, "note": "视频", "imp": 1047, "ctr": 0.0, "fans": 0, "watchSec": 23}, {"t": "🍉萌娃吃瓜爆料，笑翻全场", "date": "2026-05-09", "plays": 8895, "likes": 71, "comments": 1, "shares": 18, "favors": 15, "note": "视频", "imp": 37016, "ctr": 0.0, "fans": 52, "watchSec": 21}, {"t": "🎉瑞众「清醒小课堂」第二期开课啦", "date": "2026-05-13", "plays": 48, "likes": 1, "comments": 0, "shares": 0, "favors": 1, "note": "视频", "imp": 998, "ctr": 0.0, "fans": 0, "watchSec": 18}, {"t": "《给投保人的一封信》", "date": "2026-05-14", "plays": 167, "likes": 0, "comments": 0, "shares": 1, "favors": 2, "note": "视频", "imp": 1071, "ctr": 0.0, "fans": 1, "watchSec": 17}, {"t": "❓“特靠谱”到底是啥宝贝", "date": "2026-05-14", "plays": 1268, "likes": 4, "comments": 0, "shares": 1, "favors": 2, "note": "视频", "imp": 1980, "ctr": 0.0, "fans": 3, "watchSec": 18}, {"t": "📄听说最近有份文件传开了！？", "date": "2026-05-19", "plays": 47, "likes": 1, "comments": 0, "shares": 0, "favors": 0, "note": "视频", "imp": 898, "ctr": 0.0, "fans": 0, "watchSec": 11}, {"t": "瑞众保险护航2026内蒙古自治区足球超级联赛", "date": "2026-05-21", "plays": 75, "likes": 1, "comments": 0, "shares": 1, "favors": 1, "note": "视频", "imp": 966, "ctr": 0.0, "fans": 1, "watchSec": 14}, {"t": "瑞众保险再度亮相央视王牌综艺《越战越勇》", "date": "2026-05-22", "plays": 160, "likes": 4, "comments": 0, "shares": 1, "favors": 0, "note": "视频", "imp": 1394, "ctr": 0.0, "fans": 0, "watchSec": 40}, {"t": "💪瑞众保险 × 央视《越战越勇》", "date": "2026-05-26", "plays": 51, "likes": 0, "comments": 0, "shares": 0, "favors": 0, "note": "视频", "imp": 941, "ctr": 0.0, "fans": 1, "watchSec": 19}, {"t": "给阿嫲的，不只是一封情书", "date": "2026-05-27", "plays": 203, "likes": 3, "comments": 0, "shares": 2, "favors": 1, "note": "视频", "imp": 1043, "ctr": 0.0, "fans": 1, "watchSec": 39}, {"t": "瑞众保险×《越战越勇》第二期节目正片来袭", "date": "2026-05-29", "plays": 80, "likes": 3, "comments": 0, "shares": 0, "favors": 0, "note": "视频", "imp": 998, "ctr": 0.0, "fans": 0, "watchSec": 31}, {"t": "🤝🏻 瑞美好・众人行", "date": "2026-05-29", "plays": 167, "likes": 7, "comments": 0, "shares": 0, "favors": 2, "note": "视频", "imp": 1348, "ctr": 0.0, "fans": 2, "watchSec": 12}, {"t": "⏳一代人有一代人的童年", "date": "2026-06-01", "plays": 63, "likes": 3, "comments": 0, "shares": 3, "favors": 0, "note": "视频", "imp": 904, "ctr": 0.0, "fans": 0, "watchSec": 20}, {"t": "🎬 瑞众保险 × 央视《越战越勇》", "date": "2026-06-03", "plays": 54, "likes": 2, "comments": 0, "shares": 0, "favors": 0, "note": "视频", "imp": 1124, "ctr": 0.0, "fans": 0, "watchSec": 6}, {"t": "瑞众保险 × 央视《越战越勇》压轴来袭", "date": "2026-06-05", "plays": 109, "likes": 2, "comments": 0, "shares": 3, "favors": 0, "note": "视频", "imp": 1509, "ctr": 0.0, "fans": 2, "watchSec": 1}, {"t": "搞笑萌娃系列 高考温馨提示篇，欢乐上线！", "date": "2026-06-06", "plays": 83, "likes": 3, "comments": 0, "shares": 0, "favors": 1, "note": "视频", "imp": 1017, "ctr": 0.0, "fans": 0, "watchSec": 5}, {"t": "瑞众保险倾情赞助广州猎德龙船盛会", "date": "2026-06-08", "plays": 105, "likes": 2, "comments": 1, "shares": 2, "favors": 0, "note": "视频", "imp": 1436, "ctr": 0.0, "fans": 0, "watchSec": 4}, {"t": "瑞众「好服务」故事汇AI系列短剧第二期上线", "date": "2026-06-16", "plays": 76, "likes": 2, "comments": 1, "shares": 10, "favors": 1, "note": "视频", "imp": 822, "ctr": 0.0, "fans": 0, "watchSec": 6}, {"t": "瑞众「清醒小课堂」618特辑开课啦", "date": "2026-06-18", "plays": 87, "likes": 2, "comments": 2, "shares": 1, "favors": 1, "note": "视频", "imp": 949, "ctr": 0.0, "fans": 0, "watchSec": 8}, {"t": "📜 一纸保单，藏着父亲未曾言明的偏爱", "date": "2026-06-21", "plays": 43, "likes": 1, "comments": 1, "shares": 0, "favors": 0, "note": "视频", "imp": 847, "ctr": 0.0, "fans": 0, "watchSec": 4}, {"t": "RUIAl｜如果四大名著有保险《红楼梦》篇", "date": "2026-06-29", "plays": 103, "likes": 3, "comments": 1, "shares": 4, "favors": 1, "note": "视频", "imp": 798, "ctr": 0.0, "fans": 0, "watchSec": 7}, {"t": "RUIAl｜如果四大名著有保险《水浒传》篇", "date": "2026-06-29", "plays": 73, "likes": 1, "comments": 1, "shares": 1, "favors": 0, "note": "视频", "imp": 681, "ctr": 0.0, "fans": 0, "watchSec": 11}, {"t": "RUIAI｜如果四大名著有保险《西游记》篇", "date": "2026-06-29", "plays": 66, "likes": 2, "comments": 1, "shares": 2, "favors": 0, "note": "视频", "imp": 740, "ctr": 0.0, "fans": 0, "watchSec": 17}, {"t": "RUIAl｜如果四大名著有保险《三国演义》篇", "date": "2026-06-29", "plays": 68, "likes": 2, "comments": 0, "shares": 1, "favors": 0, "note": "视频", "imp": 707, "ctr": 0.0, "fans": 0, "watchSec": 6}, {"t": "瑞众保险荣登2026「中国500最具价值品牌」", "date": "2026-06-29", "plays": 125, "likes": 4, "comments": 2, "shares": 4, "favors": 2, "note": "视频", "imp": 1193, "ctr": 0.0, "fans": 1, "watchSec": 5}, {"t": "钱袋子历险记 | 防范非法金融活动宣传月", "date": "2026-06-30", "plays": 41, "likes": 1, "comments": 0, "shares": 0, "favors": 0, "note": "视频", "imp": 902, "ctr": 0.0, "fans": 1, "watchSec": 1}, {"t": "☔穿越千年看保险：古人如何未雨绸缪？", "date": "2026-06-30", "plays": 44, "likes": 4, "comments": 0, "shares": 0, "favors": 1, "note": "视频", "imp": 503, "ctr": 0.0, "fans": 1, "watchSec": 148}, {"t": "🥁三湘擂鼓 四水飞桨", "date": "2026-06-30", "plays": 42, "likes": 1, "comments": 0, "shares": 1, "favors": 2, "note": "视频", "imp": 772, "ctr": 0.0, "fans": 0, "watchSec": 5}, {"t": "🎬瑞众保险萌娃系列《萌娃的理想》上线", "date": "2026-07-01", "plays": 56, "likes": 1, "comments": 0, "shares": 0, "favors": 0, "note": "视频", "imp": 892, "ctr": 0.0, "fans": 0, "watchSec": 21}, {"t": "📜 看大唐至明清如何演绎风险管理智慧", "date": "2026-07-01", "plays": 109, "likes": 7, "comments": 0, "shares": 2, "favors": 6, "note": "视频", "imp": 1192, "ctr": 0.0, "fans": 2, "watchSec": 10}, {"t": "瑞众保险品牌形象片《大路坦然》正式发布", "date": "2026-07-02", "plays": 134, "likes": 5, "comments": 0, "shares": 1, "favors": 1, "note": "视频", "imp": 1496, "ctr": 0.0, "fans": 1, "watchSec": 7}, {"t": "👍权威发声！", "date": "2026-07-03", "plays": 162, "likes": 7, "comments": 0, "shares": 2, "favors": 2, "note": "视频", "imp": 1449, "ctr": 0.0, "fans": 0, "watchSec": 10}, {"t": "☔️看近代中国接轨现代保险文明", "date": "2026-07-03", "plays": 101, "likes": 3, "comments": 0, "shares": 0, "favors": 0, "note": "视频", "imp": 1202, "ctr": 0.0, "fans": 0, "watchSec": 4}, {"t": "🌟兵马俑AI重生之“俑”闯保险圈？", "date": "2026-07-04", "plays": 79, "likes": 2, "comments": 1, "shares": 2, "favors": 2, "note": "视频", "imp": 1223, "ctr": 0.0, "fans": 0, "watchSec": 9}, {"t": "🌟兵马俑成功斩获offer变身保险新人", "date": "2026-07-05", "plays": 111, "likes": 1, "comments": 0, "shares": 0, "favors": 1, "note": "视频", "imp": 1571, "ctr": 0.0, "fans": 0, "watchSec": 2}, {"t": "🌟从“五福”特色理念，到适老关怀守护", "date": "2026-07-06", "plays": 51, "likes": 2, "comments": 0, "shares": 1, "favors": 0, "note": "视频", "imp": 780, "ctr": 0.0, "fans": 0, "watchSec": 6}, {"t": "瑞众保险搞笑萌娃系列世界杯特辑", "date": "2026-07-09", "plays": 129, "likes": 3, "comments": 1, "shares": 9, "favors": 1, "note": "视频", "imp": 1582, "ctr": 0.0, "fans": 1, "watchSec": 4}, {"t": "绿茵赛场，门将镇守球门，守住全队希望", "date": "2026-07-15", "plays": 39, "likes": 0, "comments": 0, "shares": 0, "favors": 0, "note": "视频", "imp": 866, "ctr": 0.0, "fans": 0, "watchSec": 2}, {"t": "👍权威发声再出圈！", "date": "2026-07-16", "plays": 184, "likes": 3, "comments": 1, "shares": 1, "favors": 2, "note": "视频", "imp": 1738, "ctr": 0.0, "fans": 2, "watchSec": 20}, {"t": "✨三载积淀，一朝淬炼", "date": "2026-07-20", "plays": 184, "likes": 1, "comments": 0, "shares": 1, "favors": 0, "note": "视频", "imp": 1711, "ctr": 0.0, "fans": 2, "watchSec": 19}, {"t": "💫瑞众保险专场冠名围甲联赛", "date": "2026-07-28", "plays": 66, "likes": 0, "comments": 0, "shares": 0, "favors": 0, "note": "视频", "imp": 1076, "ctr": 0.0, "fans": 0, "watchSec": 2}, {"t": "📢风险小怪兽的碰壁日常系列视频上线啦！", "date": "2026-07-31", "plays": 97, "likes": 0, "comments": 0, "shares": 0, "favors": 0, "note": "视频", "imp": 1082, "ctr": 0.0, "fans": 0, "watchSec": 4}, {"t": "📚反保险欺诈科普指南", "date": "2026-07-31", "plays": 107, "likes": 2, "comments": 1, "shares": 0, "favors": 1, "note": "视频", "imp": 1302, "ctr": 0.0, "fans": 0, "watchSec": 27}, {"t": "瑞众保险温馨推出行业首支产说会MV", "date": "2026-08-03", "plays": 289, "likes": 7, "comments": 1, "shares": 34, "favors": 2, "note": "视频", "imp": 2112, "ctr": 0.0, "fans": 6, "watchSec": 45}, {"t": "十五五崭新开局，瑞众保险成立三周年", "date": "2026-08-20", "plays": 73, "likes": 0, "comments": 0, "shares": 5, "favors": 0, "note": "视频", "imp": 855, "ctr": 0.0, "fans": 0, "watchSec": 4}, {"t": "客户嘉年华美好奇遇之旅宣传片正式发布", "date": "2026-08-21", "plays": 87, "likes": 1, "comments": 0, "shares": 0, "favors": 0, "note": "视频", "imp": 631, "ctr": 0.0, "fans": 0, "watchSec": 12}, {"t": "😈风险小怪兽吸取教训", "date": "2026-08-25", "plays": 34, "likes": 1, "comments": 0, "shares": 0, "favors": 0, "note": "视频", "imp": 518, "ctr": 0.0, "fans": 0, "watchSec": 4}, {"t": "瑞众保险发布2025年度ESG暨社会责任报告", "date": "2026-08-28", "plays": 63, "likes": 2, "comments": 0, "shares": 0, "favors": 0, "note": "视频", "imp": 595, "ctr": 0.0, "fans": 0, "watchSec": 2}, {"t": "🌟瑞众保险2026投资中期答卷出炉", "date": "2026-09-02", "plays": 67, "likes": 0, "comments": 0, "shares": 0, "favors": 1, "note": "视频", "imp": 819, "ctr": 0.0, "fans": 2, "watchSec": 21}]}, "accounts": [{"id": "rz_dy", "brand": "瑞众", "platform": "抖音", "name": "瑞众 · 抖音"}, {"id": "rz_xhs", "brand": "瑞众", "platform": "小红书", "name": "瑞众 · 小红书"}], "columns": {"rz_dy": [{"id": "5p84buir", "name": "老客户回忆录", "pos": "体现瑞众对客户的用心与守护，让大家看到保险数字背后一个个活生生的人和家庭，感受服务的精细化、人文关怀与定制化", "keywords": ["老客户", "真实故事", "家庭", "守护", "时代记忆"], "pref": "沉稳大气有质感，克制不煽情，用旧照片和物件承载时间", "ctype": "story", "findProfile": "年龄带（如 60-85 岁） / 城市线级（一二线优先） / 时代身份标签（第一代纺织女工、铁道兵家属、支边教师等） / 家庭结构（三代同堂优先） / 表达能力（自然、口齿清晰） / 与瑞众的关系（本人或子女投保、保单年限）", "hooks": "女性议题（一线城市独立女性）,节日节点（国庆/春节/妇女节）,时代记忆（老照片/粮票/全家福）,职业故事,家庭守护", "nodes": "10-01 国庆→《与国同行》：寻访见证国家历史的高龄老客户;03-08 妇女节→一线打拼的独立女性;09-01 开学→隔代接送的祖辈守护", "taboos": ["不消费苦难", "不虚构案例", "不承诺收益与保本", "历史表述需准确", "不点名竞品", "未获授权不使用真实姓名"], "goodSample": "《与国同行》——她和共和国同年出生：寻访 75-85 岁、见证国家历史节点的高龄客户，个人史×国家史双线叙事，克制不煽情", "badSample": "这款产品保额高达 500 万（纯产品广告，数字背后没有人）"}, {"id": "a1d62k4d", "name": "瑞众说险", "pos": "品牌官方科普主阵地", "keywords": ["保险", "科普", "瑞众"], "pref": "体系化栏目感", "ctype": "hot", "findProfile": "", "hooks": "产品科普,新规解读", "nodes": "", "taboos": ["不承诺收益", "不使用绝对化用语"], "goodSample": "重疾险新规周年数据解读", "badSample": "条款原文照读"}, {"id": "jnjsv345", "name": "健康守护站", "pos": "健康险与健康管理内容", "keywords": ["健康", "医疗", "体检"], "pref": "实用导向", "ctype": "hot", "findProfile": "", "hooks": "体检季,带病投保,健康管理", "nodes": "", "taboos": ["不做诊疗建议", "不夸大疗效"], "goodSample": "「带病投保」核保放宽怎么看", "badSample": "包治百病式表述"}, {"id": "vm4k5k3g", "name": "财富放大镜", "pos": "储蓄、年金与资产配置解读", "keywords": ["储蓄", "理财", "利率"], "pref": "数据驱动", "ctype": "hot", "findProfile": "", "hooks": "存款利率,资产配置", "nodes": "", "taboos": ["不承诺收益", "不预测市场"], "goodSample": "存款利率下调后的三种替代方案", "badSample": "理财产品推荐"}, {"id": "0rt21sby", "name": "职场保障课", "pos": "面向职场人的社保/商保内容", "keywords": ["社保", "职场", "打工人"], "pref": "共鸣+干货", "ctype": "hot", "findProfile": "", "hooks": "社保新规,裁员潮,灵活就业", "nodes": "", "taboos": ["不承诺收益", "不制造焦虑"], "goodSample": "灵活就业者怎么配保障", "badSample": "恐吓式营销"}, {"id": "i0cguhjt", "name": "热点锐评", "pos": "热点事件快速反应栏目", "keywords": ["热点", "锐评"], "pref": "快，24小时内", "ctype": "hot", "findProfile": "", "hooks": "社会热点,民生话题", "nodes": "", "taboos": ["不碰敏感事件", "不点名竞品"], "goodSample": "'牛来了'行情下的冷静家庭观", "badSample": "跟风玩梗无观点"}], "rz_xhs": [{"id": "1wy99656", "name": "保险避坑指南", "pos": "小红书风格避坑种草笔记", "keywords": ["避坑", "保险怎么买"], "pref": "清单体、对比图", "ctype": "hot", "findProfile": "", "hooks": "避坑,对比测评", "nodes": "", "taboos": ["不承诺收益", "不拉踩同业"], "goodSample": "第一次买保险的 5 个坑", "badSample": "产品硬广"}, {"id": "eufg8bey", "name": "精致养老笔记", "pos": "女性向养老规划生活方式内容", "keywords": ["养老", "FIRE", "精致生活"], "pref": "生活方式植入", "ctype": "hot", "findProfile": "", "hooks": "FIRE生活,养老社区", "nodes": "", "taboos": ["不承诺收益"], "goodSample": " FIRE 五年后的养老账本", "badSample": "年金广告"}, {"id": "j62dkxan", "name": "宝妈保障日记", "pos": "母婴家庭保障内容", "keywords": ["宝妈", "少儿保险", "家庭"], "pref": "场景化、共情", "ctype": "story", "findProfile": "孩子年龄 / 城市线级 / 家庭结构 / 投保经历 / 表达意愿", "hooks": "开学季,育儿焦虑,家庭守护", "nodes": "09-01 开学季", "taboos": ["不贩卖焦虑", "不虚构案例", "需授权"], "goodSample": "学平险开学季五问", "badSample": "不买就吃亏式话术"}, {"id": "b2fsfehv", "name": "都市丽人理财", "pos": "都市女性理财与保障", "keywords": ["理财", "女性", "存钱"], "pref": "轻量化、种草感", "ctype": "hot", "findProfile": "", "hooks": "存钱挑战,利率下行", "nodes": "", "taboos": ["不承诺收益"], "goodSample": "存款搬家搬去哪", "badSample": "荐股荐基"}, {"id": "87ir7kce", "name": "热点轻解读", "pos": "热点话题的轻量化解读", "keywords": ["热点", "民生"], "pref": "短平快", "ctype": "hot", "findProfile": "", "hooks": "社会热点", "nodes": "", "taboos": ["不碰敏感事件"], "goodSample": "开学季学平险咨询暴涨解读", "badSample": "纯玩梗"}]}, "cards": [{"id": "ZX6WTH", "owner": "江洋", "createdAt": 1788017891456, "source": "热点抓取", "scheduleDate": "待定", "publishDate": null, "status": "脚本中", "statusEnteredAt": 1788709091456, "snapshot": {"url": "https://zhihu.com/hot/789", "heat": "67.5w（知乎热榜）", "relation": "健康守护站核心议题", "creative": "情景短剧：核保咨询场景"}, "adoptNote": "", "links": [], "approval": null, "logs": [{"who": "江洋", "time": 1788709091456, "action": "复制卡片给外部 AI"}], "pendNote": "脚本方向待品牌方确认", "title": "「带病投保」核保放宽，慢病人群怎么选？", "accountId": "rz_dy", "columnId": "jnjsv345"}, {"id": "YPNQS0", "owner": "江洋", "createdAt": 1788017891456, "source": "热点抓取", "scheduleDate": null, "publishDate": null, "status": "已立项", "statusEnteredAt": 1788795491456, "snapshot": {"url": "https://baidu.com/hot/111", "heat": "76.1w（百度热搜）", "relation": "储蓄替代方案", "creative": "存款/国债/年金收益实测"}, "adoptNote": "", "links": [], "approval": null, "logs": [{"who": "江洋", "time": 1788795491456, "action": "采纳周报选题"}], "pendNote": "", "title": "存款利率再降，「存款搬家」搬去哪？", "accountId": "rz_xhs", "columnId": "b2fsfehv"}, {"id": "VII1PN", "owner": "江洋", "createdAt": 1788017891456, "source": "热点抓取", "scheduleDate": "待定", "publishDate": null, "status": "已立项", "statusEnteredAt": 1788536291456, "snapshot": {"url": "https://xhslink.com/hot/556", "heat": "54.3w（小红书热榜）", "relation": "精致养老笔记核心议题", "creative": "体验官视角：居家护理的一天"}, "adoptNote": "", "links": [], "approval": null, "logs": [{"who": "江洋", "time": 1788536291456, "action": "采纳周报选题"}], "pendNote": "上线时间待官方官宣", "title": "首款长期护理险居家服务包上线", "accountId": "rz_xhs", "columnId": "eufg8bey"}], "reports": [{"id": "9rk2r9dw", "accountId": "rz_dy", "week": "2026-W37", "generatedAt": 1788878291456, "items": [{"id": "5cerpspt", "columnId": "5p84buir", "title": "《与国同行》——她和共和国同年出生", "heat": "灵感型（节点：国庆）", "sample": true, "relation": "瑞众「用心与守护」品牌叙事 × 国庆家国情绪 × 栏目定位「数字背后活生生的人」", "creative": "个人史 × 国家史双线叙事，克制不煽情", "profile": "75-85 岁，女性优先；一二线城市；时代身份标签任一（第一代纺织女工 / 铁道兵家属 / 支边教师）；子女为瑞众客户、本人持有长期保单；表达自然、家人支持拍摄", "storyDir": "从「她的嫁妆是一张 1953 年的储蓄单」讲起，用旧照片和物件承载时间，讲到今天瑞众守护的延续；结尾落回「保单背后的家国六十年」", "trigger": "节点日历 · 国庆（10-01）", "status": "待处理"}, {"id": "2e7rncxz", "columnId": "5p84buir", "title": "《她在异乡的第十年》——一线城市独立女性生活志", "heat": "灵感型（钩子：女性议题）", "sample": true, "relation": "一二线中产受众的强共鸣议题 × 瑞众「守护每一个认真生活的人」", "creative": "以「一个人过节的第十个国庆」切入，呈现独立生活的秩序感与安全感来源", "profile": "28-38 岁女性；一二线城市；职业多元（金融 / 设计 / 医疗）；有自主保障意识或正在配置；表达开放、愿意出镜", "storyDir": "记录她的日常动线与「给自己托底」的清单，保单作为安全感隐喻之一软性出现；结尾问她「十年后想成为什么样的人」", "trigger": "栏目钩子 · 女性议题 × 国庆独居话题季", "status": "待处理"}, {"id": "yzrr2gae", "columnId": "5p84buir", "title": "《一张全家福的六十年》", "heat": "灵感型（钩子：时代记忆）", "sample": true, "relation": "时代记忆 × 家庭守护，落在瑞众「定制化服务」的人文气质", "creative": "用 1960s-2020s 六张同位置全家福串起家庭史", "profile": "家中保存跨越 60 年完整全家福；长辈健在且口齿清晰；三代同堂优先；家庭氛围开放", "storyDir": "每张照片讲一个十年；瑞众陪伴的是「下一张全家福」的安心；旧照片修复环节可做品牌服务植入", "trigger": "栏目钩子 · 时代记忆 × 老照片话题", "status": "待处理"}], "sample": true}], "clientReports": [], "brandCards": {"瑞众": {"audience": "一二线城市中产及以上精英人群，注重品质与人文关怀", "tone": "沉稳大气、有质感、克制不煽情，讲「数字背后活生生的人」", "taboos": ["不承诺收益与保本", "不使用绝对化用语", "不贬低同业", "不消费苦难", "历史表述需准确", "未获授权不使用真实姓名"]}}, "bench": {"rate": 3.5, "label": "行业通用及格线"}, "__mig": 6};</script>
+<canvas id="stars"></canvas>
+<div id="edgezone" title="导航"></div>
+<aside id="drawer-nav">
+  <div class="dn-cap"></div>
+  <button class="dn-item" data-act="nav" data-v="pipe"><span class="ic">🛰</span>星轨流水线</button>
+  <button class="dn-item" data-act="nav" data-v="weekly"><span class="ic">🗞</span>选题周报</button>
+  <button class="dn-item" data-act="nav" data-v="cal"><span class="ic">📅</span>排期日历</button>
+  <button class="dn-item" data-act="nav" data-v="arch"><span class="ic">🗄</span>归档库</button>
+  <button class="dn-item" data-act="nav" data-v="data"><span class="ic">📊</span>数据看板</button>
+  <button class="dn-item" data-act="nav" data-v="cols"><span class="ic">⚙️</span>栏目设置</button>
+  <div class="dn-foot">
+    <button class="btn sm ghost" id="pin-btn" data-act="nav-pin" title="固定 / 隐藏（悬停模式）">📌 固定常驻</button>
+    <div class="hint" style="padding:var(--sp-2) var(--sp-2);text-align:center">悬停左缘唤出 · 移开自动收起</div>
+  </div>
+</aside>
+<div class="app">
+  <header>
+    <button id="nav-trigger" class="btn ghost sm" data-act="nav-pin" title="固定 / 隐藏侧边导航（悬停左缘亦可唤出）">☰</button>
+    <div class="logo"><span class="orb"></span>自媒体<em>工作台</em></div>
+    <span class="acct" id="acct-badge" data-act="facet-clear" title="当前平台筛选 · 点击恢复全部">全部平台 ▾</span>
+    <span class="clock" id="clock"></span>
+    <input id="search" placeholder="🔍 搜索选题标题…">
+    <button class="btn ghost sm" data-act="user-edit" id="user-chip" title="点击修改登录人（记录到操作日志）">👤</button>
+    <button class="btn ghost sm" data-act="reset-ask" title="重置演示数据">↺</button>
+    <button class="btn ghost sm" id="config-btn" data-act="config-open" title="服务配置（LLM Key / 行业基准 / 导出）">⚙</button>
+    <button class="btn solid" data-act="report-open">⚡ 生成汇报链接</button>
+  </header>
+  <div id="view"></div>
+</div>
+
+<div id="drawer-mask" data-act="close-drawer"></div>
+<aside id="drawer"></aside>
+<div class="modal-mask" id="modal-mask"><div class="modal" id="modal-box"></div></div>
+<nav id="mtabs">
+  <button data-act="nav" data-v="pipe"><span class="ic">🛰</span>流水线</button>
+  <button data-act="nav" data-v="weekly"><span class="ic">🗞</span>周报</button>
+  <button data-act="nav" data-v="cal"><span class="ic">📅</span>日历</button>
+  <button data-act="nav" data-v="arch"><span class="ic">🗄</span>归档</button>
+  <button data-act="nav" data-v="data"><span class="ic">📊</span>看板</button>
+  <button data-act="nav" data-v="cols"><span class="ic">⚙️</span>栏目</button>
+</nav>
+<div id="toasts"></div>
+
+<script>
+/* ============================================================
+   自媒体工作台 v2 · 数据引擎（移植自档一 MVP，localStorage 持久化）
+   数据模型严格对应 PRD v2.0 §3 / §4 / §5
+============================================================ */
+const LS_KEY = "xingui_zhongshu_v2";
+const STATUSES = ["待筛选","已立项","脚本中","审批中","制作中","已发布"];
+const STATUS_TOKEN = {"待筛选":"--st-wait","已立项":"--st-accepted","脚本中":"--st-script",
+  "审批中":"--st-approval","制作中":"--st-making","已发布":"--st-published","已搁置":"--st-shelved"};
+let ACCTS = [
+  {id:"gs_dy", brand:"国寿", platform:"抖音",   name:"国寿 · 抖音",   tk:"--ac-gs"},
+  {id:"rz_dy", brand:"瑞众", platform:"抖音",   name:"瑞众 · 抖音",   tk:"--ac-rzdy"},
+  {id:"rz_xhs",brand:"瑞众", platform:"小红书", name:"瑞众 · 小红书", tk:"--ac-rzxhs"},
+];
+const CHAINS = {
+  "国寿":["乙方内审 · 皮总","客户初审 · 朱老师","客户终审 · 万处"],
+  "瑞众":["内部审核","苏子龙审核","落处审核","部门总审核"]
+};
+const LINK_TYPES = ["第一轮提报","第二轮脚本","分秒针成片","发布链接"];
+const LINK_LABEL = {"第一轮提报":"📄 第一轮提报","提报方案终稿":"📄 第一轮提报","第二轮脚本":"📋 第二轮脚本","分秒针成片":"🎬 成片","发布链接":"▶ 观看成片"};
+const clientLinkBtns = c => (c.links||[]).map(l=>
+  `<a class="btn sm solid" style="text-decoration:none;margin:0 var(--sp-2) var(--sp-2) 0" href="${esc(l.url)}" target="_blank" rel="noopener">${LINK_LABEL[l.type]||esc(l.type)}</a>`).join("")
+  || `<span class="hint">待提报</span>`;
+const HOT_POOL = [
+  {t:"个人养老金账户缴存上限拟上调，税优政策再加码",heat:"96.2w",src:"微博热榜"},
+  {t:"国家医保局：门诊统筹报销比例再提高",heat:"88.7w",src:"抖音热榜"},
+  {t:"延迟退休细则落地，80/90 后养老规划登热搜",heat:"102.4w",src:"微博热榜"},
+  {t:"多家银行下调存款利率，「存款搬家」话题发酵",heat:"76.1w",src:"百度热搜"},
+  {t:"重疾险新规实施周年，理赔数据首次公开",heat:"65.8w",src:"知乎热榜"},
+  {t:"「外卖骑手职业伤害保障」试点扩至全国",heat:"71.2w",src:"抖音热榜"},
+  {t:"金价创新高，家庭资产配置话题阅读量破 10 亿",heat:"118.9w",src:"微博热榜"},
+  {t:"首款长期护理险居家服务包上线",heat:"54.3w",src:"小红书热榜"},
+  {t:"开学季「学平险」咨询量环比涨 300%",heat:"48.6w",src:"微信指数"},
+  {t:"AI 理赔提速：平均结案时长缩短至 1.8 天",heat:"59.0w",src:"36氪热榜"},
+  {t:"惠民保 2026 版开放参保，多地升级特药目录",heat:"83.4w",src:"抖音热榜"},
+  {t:"「带病投保」核保放宽，慢病人群保障受关注",heat:"67.5w",src:"知乎热榜"},
+];
+const CREATIVE_TPL = [
+  "以「{kw}」为切口做一期避坑科普：3 个真实案例讲清最常见误区，结尾给自查清单",
+  "用情景短剧形式切入「{kw}」：还原一个高频咨询场景，反转收尾带出正确做法",
+  "做一期「{kw}」数据解读：把政策/数据翻译成一张图，主打收藏转发",
+  "街采 + 专家双视角聊「{kw}」：前半段路人真实困惑，后半段 30 秒干货解答",
+  "蹭热点做「{kw}」快评：24 小时内跟进，一句话立场 + 三点影响 + 行动建议",
+];
+
+/* ---------- 工具 ---------- */
+const $ = s => document.querySelector(s);
+const uid = () => Math.random().toString(36).slice(2,10);
+const esc = s => String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c]);
+const fmtD = ts => {const d=new Date(ts);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`};
+const fmtT = ts => {const d=new Date(ts);const p=n=>String(n).padStart(2,"0");return `${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`};
+const daysIn = c => Math.floor((Date.now()-c.statusEnteredAt)/86400000);
+const overdue = c => daysIn(c)>7 && c.status!=="已发布";
+const tok = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const weekLabel = (ts=Date.now()) => {const d=new Date(ts);const onejan=new Date(d.getFullYear(),0,1);
+  const wk=Math.ceil((((d-onejan)/86400000)+onejan.getDay()+1)/7);
+  return `${d.getFullYear()}-W${String(wk).padStart(2,"0")}`};
+
+/* ---------- 种子数据（档一 MVP 种子 + 待定演示卡） ---------- */
+function seedState(){
+  const accounts = ACCTS.map(a=>({id:a.id,brand:a.brand,platform:a.platform,name:a.name}));
+  const C = (name,pos,keywords,pref)=>({id:uid(),name,pos,keywords,pref});
+  const columns = {
+    gs_dy:[
+      C("理赔故事汇","用真实理赔案例传递保障价值，建立信任",["理赔","重疾险 理赔","医疗险 报销"],"真实案例优先，情绪共鸣强"),
+      C("保险知识局","硬核科普，把保险条款讲成人话",["保险条款","避坑","科普"],"收藏向干货，一图流优先"),
+      C("养老规划室","面向 30-45 岁人群的养老与年金内容",["养老金","年金","退休"],"政策解读+算账类内容"),
+      C("热点解读","财经民生热点的保险视角快评",["热点","政策","民生"],"24小时内跟进，观点鲜明"),
+      C("客户见证","客户口述与服务故事，软性品牌内容",["客户故事","服务"],"真实感，拒绝硬广"),
+    ],
+    rz_dy:[
+      C("瑞众说险","品牌官方科普主阵地",["保险","科普","瑞众"],"体系化栏目感"),
+      C("健康守护站","健康险与健康管理内容",["健康","医疗","体检"],"实用导向"),
+      C("财富放大镜","储蓄、年金与资产配置解读",["储蓄","理财","利率"],"数据驱动"),
+      C("职场保障课","面向职场人的社保/商保内容",["社保","职场","打工人"],"共鸣+干货"),
+      C("热点锐评","热点事件快速反应栏目",["热点","锐评"],"快，24小时内"),
+    ],
+    rz_xhs:[
+      C("保险避坑指南","小红书风格避坑种草笔记",["避坑","保险怎么买"],"清单体、对比图"),
+      C("精致养老笔记","女性向养老规划生活方式内容",["养老","FIRE","精致生活"],"生活方式植入"),
+      C("宝妈保障日记","母婴家庭保障内容",["宝妈","少儿保险","家庭"],"场景化、共情"),
+      C("都市丽人理财","都市女性理财与保障",["理财","女性","存钱"],"轻量化、种草感"),
+      C("热点轻解读","热点话题的轻量化解读",["热点","民生"],"短平快"),
+    ],
+  };
+  const now=Date.now(), D=86400000;
+  const col=(a,i)=>columns[a][i].id;
+  const mk=o=>Object.assign({id:uid().slice(0,6).toUpperCase(),owner:"江洋",createdAt:now-10*D,
+    source:"热点抓取",scheduleDate:null,publishDate:null,status:"待筛选",statusEnteredAt:now-2*D,
+    snapshot:null,adoptNote:"",links:[],approval:null,logs:[],pendNote:""},o);
+  const cards=[
+    mk({title:"个人养老金缴存上限上调，一年多省多少税？",accountId:"gs_dy",columnId:col("gs_dy",2),
+      status:"待筛选",statusEnteredAt:now-1*D,
+      snapshot:{url:"https://weibo.com/hot/123456",heat:"96.2w（微博热榜）",relation:"与「养老规划室」定位高度相关，可承接国寿养老品牌叙事",creative:"做一期算账类内容：3 档收入实测节税金额，一张图讲清"},
+      adoptNote:"结合年金产品做软植入，不要硬广",
+      logs:[{who:"江洋",time:now-1*D,action:"采纳周报选题，卡片自动生成"}]}),
+    mk({title:"延迟退休细则落地：80/90 后要多缴几年？",accountId:"gs_dy",columnId:col("gs_dy",2),
+      status:"已立项",statusEnteredAt:now-3*D,scheduleDate:"待定",pendNote:"发布档期未与客户确认",
+      snapshot:{url:"https://weibo.com/hot/123457",heat:"102.4w（微博热榜）",relation:"养老规划室核心议题",creative:"街采+专家双视角，后半段 30 秒干货"},
+      adoptNote:"热点期快出",logs:[{who:"江洋",time:now-3*D,action:"手动流转：待筛选 → 已立项"}]}),
+    mk({title:"外卖骑手职业伤害保障全国试点，平台要缴多少？",accountId:"gs_dy",columnId:col("gs_dy",3),
+      status:"脚本中",statusEnteredAt:now-9*D,
+      snapshot:{url:"https://douyin.com/hot/888",heat:"71.2w（抖音热榜）",relation:"热点解读栏目，新就业形态保障议题",creative:"24 小时快评：一句话立场+三点影响"},
+      logs:[{who:"江洋",time:now-9*D,action:"复制卡片给外部 AI，进入脚本阶段"}]}),
+    mk({title:"重疾险新规周年：理赔数据首次公开解读",accountId:"gs_dy",columnId:col("gs_dy",0),
+      status:"审批中",statusEnteredAt:now-1*D,scheduleDate:fmtD(now+5*D),
+      snapshot:{url:"https://zhihu.com/hot/456",heat:"65.8w（知乎热榜）",relation:"理赔故事汇，数据背书增强信任",creative:"数据解读一图流，主打收藏"},
+      links:[{type:"第一轮提报",url:"https://docs.example.com/final/zx-v3",addedAt:now-2*D}],
+      approval:{round:1,chain:[
+        {name:"乙方内审 · 皮总",result:"通过",comment:"数据引用注意口径",time:now-20*3600000},
+        {name:"客户初审 · 朱老师",result:null,comment:"",time:null},
+        {name:"客户终审 · 万处",result:null,comment:"",time:null}]},
+      logs:[{who:"江洋",time:now-1*D,action:"送审：进入「审批中」，加载国寿 3 级审批链"},
+            {who:"皮总",time:now-20*3600000,action:"乙方内审 · 皮总 审批通过：数据引用注意口径"}]}),
+    mk({title:"金价创新高，家庭资产还该不该配黄金？",accountId:"gs_dy",columnId:col("gs_dy",3),
+      status:"制作中",statusEnteredAt:now-2*D,scheduleDate:fmtD(now+3*D),
+      snapshot:{url:"https://weibo.com/hot/999",heat:"118.9w（微博热榜）",relation:"热点解读+财富配置双话题",creative:"快评：一句话立场+三点影响+行动建议"},
+      links:[{type:"提报方案终稿",url:"https://docs.example.com/final/gold-v2",addedAt:now-4*D}],
+      approval:{round:1,chain:[
+        {name:"乙方内审 · 皮总",result:"通过",comment:"",time:now-4*D},
+        {name:"客户初审 · 朱老师",result:"通过",comment:"角度可以",time:now-3*D},
+        {name:"客户终审 · 万处",result:"通过",comment:"",time:now-2*D}]},
+      logs:[{who:"系统",time:now-2*D,action:"审批链全部通过，自动流转至「制作中」"}]}),
+    mk({title:"惠民保 2026 版开放参保：特药目录升级了什么",accountId:"gs_dy",columnId:col("gs_dy",1),
+      status:"已发布",statusEnteredAt:now-6*D,scheduleDate:fmtD(now-6*D),publishDate:fmtD(now-6*D),
+      snapshot:{url:"https://douyin.com/hot/777",heat:"83.4w（抖音热榜）",relation:"保险知识局，政策科普",creative:"一张图讲清升级点"},
+      links:[{type:"发布链接",url:"https://douyin.com/video/7123456",addedAt:now-6*D}],
+      logs:[{who:"江洋",time:now-6*D,action:"发布，状态更新为「已发布」"}]}),
+    mk({title:"学平险开学季咨询暴涨：家长最关心的 5 个问题",accountId:"gs_dy",columnId:col("gs_dy",1),
+      status:"已搁置",statusEnteredAt:now-15*D,
+      snapshot:{url:"https://weixin.com/index/321",heat:"48.6w（微信指数）",relation:"保险知识局，季节性选题",creative:"清单体避坑"},
+      logs:[{who:"江洋",time:now-15*D,action:"搁置：开学季窗口已过，资产封存"}]}),
+    mk({title:"「带病投保」核保放宽，慢病人群怎么选？",accountId:"rz_dy",columnId:col("rz_dy",1),
+      status:"脚本中",statusEnteredAt:now-2*D,scheduleDate:"待定",pendNote:"脚本方向待品牌方确认，暂缓排期",
+      snapshot:{url:"https://zhihu.com/hot/789",heat:"67.5w（知乎热榜）",relation:"健康守护站核心议题",creative:"情景短剧：还原核保咨询场景"},
+      logs:[{who:"江洋",time:now-2*D,action:"复制卡片给外部 AI，进入脚本阶段"}]}),
+    mk({title:"存款利率再降，「存款搬家」搬去哪？",accountId:"rz_xhs",columnId:col("rz_xhs",3),
+      status:"已立项",statusEnteredAt:now-1*D,
+      snapshot:{url:"https://baidu.com/hot/111",heat:"76.1w（百度热搜）",relation:"都市丽人理财，储蓄替代方案",creative:"对比图：存款/国债/年金收益实测"},
+      logs:[{who:"江洋",time:now-1*D,action:"采纳周报选题，卡片自动生成"}]}),
+    mk({title:"首款长期护理险居家服务包上线",accountId:"rz_xhs",columnId:col("rz_xhs",1),
+      status:"已立项",statusEnteredAt:now-4*D,scheduleDate:"待定",pendNote:"服务包上线时间待官方官宣，暂缓排期",
+      snapshot:{url:"https://xhslink.com/hot/556",heat:"54.3w（小红书热榜）",relation:"精致养老笔记核心议题，可联动健康生态叙事",creative:"体验官视角：居家护理服务的一天"},
+      logs:[{who:"江洋",time:now-4*D,action:"采纳周报选题，卡片自动生成"}]}),
+  ];
+  return {user:"江洋",accounts,columns,cards,reports:[],clientReports:[]};
+}
+
+/* ---------- 服务端同步层（SQLite 仓库 + 多人合并 + 5s 轮询；断网降级本地演示） ---------- */
+let S;
+let stateVersion = 0, online = true, syncTimer = null, bootReady = false;
+async function api(path, opts){
+  const r = await fetch("/api"+path, Object.assign({headers:{"Content-Type":"application/json"}}, opts||{}));
+  const d = await r.json().catch(()=>({}));
+  if(!r.ok) throw new Error(d.error || d.detail || ("HTTP "+r.status));
+  return d;
+}
+function migrate(s){
+  // 离线演示包：剔除国寿抖音板块（数据与界面同步收窄）
+  if(window.EMBEDDED_DEMO && s.accounts && s.accounts.some(a=>a.id==="gs_dy")){
+    s.accounts=s.accounts.filter(a=>a.id!=="gs_dy");
+    if(s.columns) delete s.columns.gs_dy;
+    s.cards=(s.cards||[]).filter(c=>c.accountId!=="gs_dy");
+    s.reports=(s.reports||[]).filter(r=>r.accountId!=="gs_dy");
+    if(s.brandCards) delete s.brandCards["国寿"];
+    delete s.metrics; delete s.accountMetrics;
+  }
+  if(s.accounts) ACCTS = ACCTS.filter(a=>s.accounts.some(x=>x.id===a.id));
+  if(s.__mig>=5) return s;   // 已迁移过：跳过（防止轮询时重复补样例）
+  if(!s.brandCards) s.brandCards = {
+    "国寿":{audience:"国民品牌，覆盖下沉至三四线的宽谱系人群，家庭责任感强",tone:"国民亲切、实惠实用、有温度，大品牌安全感",
+      taboos:["不承诺收益与保本","不使用「稳赚」「绝对」等绝对化用语","不贬低同业","不消费苦难","不泄露客户隐私（需授权）"]},
+    "瑞众":{audience:"一二线城市中产及以上精英人群，注重品质与人文关怀",tone:"沉稳大气、有质感、克制不煽情，讲「数字背后活生生的人」",
+      taboos:["不承诺收益与保本","不使用绝对化用语","不贬低同业","不消费苦难","历史表述需准确","未获授权不使用真实姓名"]}};
+  const rz = s.columns.rz_dy || (s.columns.rz_dy=[]);
+  if(!rz.some(c=>c.name==="老客户回忆录")) rz.unshift({id:uid(),name:"老客户回忆录",
+    pos:"体现瑞众对客户的用心与守护，让大家看到保险数字背后一个个活生生的人和家庭，感受服务的精细化、人文关怀与定制化",
+    keywords:["老客户","真实故事","家庭","守护","时代记忆"],pref:"沉稳大气有质感，克制不煽情，用旧照片和物件承载时间",ctype:"story",
+    findProfile:"年龄带（60-85 岁）/ 城市线级（一二线优先）/ 时代身份标签（第一代纺织女工、铁道兵家属、支边教师等）/ 家庭结构（三代同堂优先）/ 表达能力 / 与瑞众的关系（本人或子女投保、保单年限）",
+    taboos:["不消费苦难","不虚构案例","不承诺收益与保本","历史表述需准确","不点名竞品","未获授权不使用真实姓名"],
+    goodSample:"《与国同行》——她和共和国同年出生：寻访 75-85 岁、见证国家历史节点的高龄客户，个人史×国家史双线叙事，克制不煽情",
+    badSample:"这款产品保额高达 500 万（纯产品广告，数字背后没有人）"});
+  Object.values(s.columns).forEach(list=>list.forEach(c=>{
+    if(!c.ctype) c.ctype = (c.findProfile||c.goodSample)?"story":"hot";
+    for(const k of ["taboos","findProfile","goodSample","badSample"]) if(!c[k]) c[k]=Array.isArray(c[k])?[]:"";
+    if(c.taboos&&!Array.isArray(c.taboos)) c.taboos=[];
+  }));
+  if(!Array.isArray(s.reports)) s.reports=[];
+  if(!s.reports.some(r=>r.sample&&r.accountId==="rz_dy"&&r.week===weekLabel())){
+    const rzCol = rz.find(c=>c.name==="老客户回忆录");
+    s.reports.unshift({id:uid(),accountId:"rz_dy",week:weekLabel(),generatedAt:Date.now()-3600000,sample:true,items:[
+      {id:uid(),columnId:rzCol.id,title:"《与国同行》——她和共和国同年出生",heat:"灵感型（节点：国庆）",sample:true,
+       relation:"瑞众「用心与守护」品牌叙事 × 国庆家国情绪 × 栏目定位「数字背后活生生的人」",
+       creative:"个人史 × 国家史双线叙事，克制不煽情",
+       profile:"75-85 岁，女性优先；一二线城市；时代身份标签任一（第一代纺织女工 / 铁道兵家属 / 支边教师）；子女为瑞众客户、本人持有长期保单；表达自然、家人支持拍摄",
+       storyDir:"从「她的嫁妆是一张 1953 年的储蓄单」讲起，用旧照片和物件承载时间，讲到今天瑞众守护的延续；结尾落回「保单背后的家国六十年」",
+       trigger:"节点日历 · 国庆（10-01）",status:"待处理"},
+      {id:uid(),columnId:rzCol.id,title:"《她在异乡的第十年》——一线城市独立女性生活志",heat:"灵感型（钩子：女性议题）",sample:true,
+       relation:"一二线中产受众的强共鸣议题 × 瑞众「守护每一个认真生活的人」",
+       creative:"以「一个人过节的第十个国庆」切入，呈现独立生活的秩序感与安全感来源",
+       profile:"28-38 岁女性；一二线城市；职业多元（金融 / 设计 / 医疗）；有自主保障意识或正在配置；表达开放、愿意出镜",
+       storyDir:"记录她的日常动线与「给自己托底」的清单，保单作为安全感隐喻之一软性出现；结尾问她「十年后想成为什么样的人」",
+       trigger:"栏目钩子 · 女性议题 × 国庆独居话题季",status:"待处理"},
+      {id:uid(),columnId:rzCol.id,title:"《一张全家福的六十年》",heat:"灵感型（钩子：时代记忆）",sample:true,
+       relation:"时代记忆 × 家庭守护，落在瑞众「定制化服务」的人文气质",
+       creative:"用 1960s-2020s 六张同位置全家福串起家庭史",
+       profile:"家中保存跨越 60 年完整全家福；长辈健在且口齿清晰；三代同堂优先；家庭氛围开放",
+       storyDir:"每张照片讲一个十年；瑞众陪伴的是「下一张全家福」的安心；旧照片修复环节可做品牌服务植入",
+       trigger:"栏目钩子 · 时代记忆 × 老照片话题",status:"待处理"}]});
+  }
+  s.__mig = 5;
+  return s;
+}
+async function bootState(){
+  if(window.EMBEDDED_DEMO && window.EMBEDDED_STATE){
+    demoMode = true; online = false;
+    S = migrate(JSON.parse(JSON.stringify(window.EMBEDDED_STATE)));
+    const cb=document.getElementById("config-btn"); if(cb) cb.style.display="none";
+    bootReady = true; route(); return;
+  }
+  try{
+    const d = await api("/state");
+    stateVersion = d.version;
+    S = migrate(d.state ? JSON.parse(JSON.stringify(d.state)) : seedState());
+    const r = await api("/state",{method:"PUT",body:JSON.stringify({baseVersion:stateVersion,state:S})});
+    stateVersion = r.version;
+    online = true;
+    api("/nodes").then(d=>{SYS_NODES=d.nodes||[];}).catch(()=>{});
+    api("/config").then(c=>{INBOX_STATUS_LAST=(c.inbox&&c.inbox.lastScan)||"";INBOX_PENDING=(c.inbox&&c.inbox.pending)||0;}).catch(()=>{});
+  }catch(e){
+    online = false;
+    let local = null;
+    try{ local = JSON.parse(localStorage.getItem(LS_KEY)); }catch(_){}
+    S = migrate(local || seedState());
+    setTimeout(()=>toast("⚠ 服务未连接，已切换本地演示模式（数据仅存本机）",true),800);
+  }
+  bootReady = true; route();
+}
+function pushState(immediate){
+  if(!online){ try{localStorage.setItem(LS_KEY,JSON.stringify(S))}catch(_){}; return; }
+  if(!immediate){ clearTimeout(syncTimer); syncTimer=setTimeout(()=>pushState(true),400); return; }
+  api("/state",{method:"PUT",body:JSON.stringify({baseVersion:stateVersion,state:S})})
+    .then(d=>{ stateVersion=d.version; }).catch(()=>{});
+}
+const save = () => pushState();
+setInterval(async()=>{
+  if(!online||!bootReady) return;
+  const act=document.activeElement;
+  if(act&&(document.getElementById("drawer").contains(act)||document.getElementById("modal-box").contains(act))) return;
+  try{
+    const d = await api("/state");
+    if(d.version>stateVersion){ stateVersion=d.version; S=migrate(d.state); render(); }
+  }catch(_){}
+},5000);
+
+/* ---------- 全局 UI 状态 ---------- */
+let CUR="pipe", MODE="track", FACET="all", calOffset=0, drawerId=null, searchQ="";
+let archFilter={status:"全部",col:"全部",q:""};
+let colAcct="gs_dy", repBrand="国寿";
+let SYS_NODES=[];   // 全局节点日历（系统共享信号，来自 /api/nodes）
+let INBOX_STATUS_LAST="", INBOX_PENDING=0;
+let demoMode=false;  // 离线演示包模式  // 收件箱巡检状态（来自 /api/config）
+let dChart="log";  // 播放趋势图视图
+
+/* ---------- 查询助手 ---------- */
+const acct = id => ACCTS.find(a=>a.id===id) || {name:"未知账号",brand:"",tk:"--muted"};
+const acctName = id => acct(id).name;
+const acctTk = id => acct(id).tk;
+const brandOf = id => acct(id).brand;
+const getCard = id => S.cards.find(c=>c.id===id);
+const colName = (aid,cid) => {const c=(S.columns[aid]||[]).find(x=>x.id===cid);return c?c.name:"未分配"};
+const inFacet = aid => FACET==="all"||aid===FACET;
+const qMatch = c => !searchQ||c.title.toLowerCase().includes(searchQ.toLowerCase());
+const pendReason = c => c.pendNote || c.adoptNote || "档期待确认";
+function addLog(card,action){ card.logs.unshift({who:S.user,time:Date.now(),action}); }
+function toast(msg,warn=false){
+  const t=document.createElement("div");t.className="toast"+(warn?" warn":"");t.textContent=msg;
+  document.getElementById("toasts").appendChild(t);
+  setTimeout(()=>{t.style.opacity="0";t.style.transition=".3s";setTimeout(()=>t.remove(),320)},3200);
+}
+const stPill = st => `<span class="pill" style="color:var(${STATUS_TOKEN[st]});border-color:color-mix(in srgb,var(${STATUS_TOKEN[st]}) 45%,transparent)">${st}</span>`;
+const acctTag = aid => `<span class="tag acct-tag" style="color:var(${acctTk(aid)});border-color:color-mix(in srgb,var(${acctTk(aid)}) 40%,transparent)">${acctName(aid)}</span>`;
+async function copyText(t){
+  try{await navigator.clipboard.writeText(t);toast("📋 已复制到剪贴板");}
+  catch(e){
+    const ta=document.createElement("textarea");ta.value=t;ta.style.position="fixed";ta.style.opacity="0";
+    document.body.appendChild(ta);ta.select();
+    try{document.execCommand("copy");toast("📋 已复制到剪贴板");}catch(_){toast("复制失败，请手动复制",true);}
+    ta.remove();
+  }
+}
+
+/* ============================================================
+   状态机引擎（PRD §4：自动 + 手动并存，审批链配置驱动）
+============================================================ */
+function setStatus(c, st, opts={}){
+  const from=c.status; if(from===st) return;
+  if(st==="审批中" && !opts.keepApproval){
+    const chain=CHAINS[brandOf(c.accountId)];
+    const hasOpen = c.approval && c.approval.chain.some(n=>!n.result);
+    if(hasOpen){ addLog(c,"回到「审批中」，恢复原审批进度（不新增轮次）"); }
+    else{
+      c.approval={round:(c.approval?c.approval.round+1:1),
+        chain:chain.map(n=>({name:n,result:null,comment:"",time:null}))};
+      addLog(c,`送审：进入「审批中」，加载${brandOf(c.accountId)} ${chain.length} 级审批链（第 ${c.approval.round} 轮）`);
+    }
+  } else addLog(c, opts.auto || `手动流转：${from} → ${st}`);
+  c.status=st; c.statusEnteredAt=Date.now();
+  if(st==="已发布" && !c.publishDate)
+    c.publishDate=(c.scheduleDate&&c.scheduleDate!=="待定")?c.scheduleDate:fmtD(Date.now());
+  save();
+}
+function approveNode(cardId){
+  const c=getCard(cardId); if(!c||c.status!=="审批中"||!c.approval)return;
+  const i=c.approval.chain.findIndex(n=>!n.result); if(i<0)return;
+  const node=c.approval.chain[i], cm=(document.getElementById("appr-comment")||{}).value||"";
+  node.result="通过"; node.comment=cm; node.time=Date.now();
+  addLog(c,`${node.name} 审批通过${cm?"："+cm:""}`);
+  if(c.approval.chain.every(n=>n.result==="通过")){
+    setStatus(c,"制作中",{auto:"审批链全部通过，自动流转至「制作中」"});
+    toast("✅ 审批链全部通过，已自动流转「制作中」");
+  } else toast(`✓ ${node.name} 审批通过`);
+  render(); renderDrawer();
+}
+function rejectNode(cardId){
+  const c=getCard(cardId); if(!c||c.status!=="审批中"||!c.approval)return;
+  const i=c.approval.chain.findIndex(n=>!n.result); if(i<0)return;
+  const node=c.approval.chain[i], cm=(document.getElementById("appr-comment")||{}).value||"";
+  node.result="驳回"; node.comment=cm; node.time=Date.now();
+  addLog(c,`${node.name} 驳回${cm?"："+cm:""}，自动退回「脚本中」`);
+  setStatus(c,"脚本中",{auto:`${node.name} 驳回，自动退回「脚本中」`});
+  toast(`✕ ${node.name} 驳回，已退回「脚本中」`,true);
+  render(); renderDrawer();
+}
+function shelveCard(id){
+  const c=getCard(id); if(!c)return;
+  setStatus(c,"已搁置",{auto:"🗄 搁置：全部过程资产封存于归档库"});
+  closeDrawer(); render(); toast("🗄 已搁置，过程资产完整保留于归档库");
+}
+function reviveCard(id){
+  const c=getCard(id); if(!c)return;
+  setStatus(c,"待筛选",{auto:"↺ 复活：已搁置 → 待筛选"});
+  render(); renderDrawer(); toast("↺ 已复活回看板「待筛选」，全部资产保留");
+}
+</script>
+
+<script>
+/* ============================================================
+   视图 1：星轨流水线（KPI + 轨道 + 舱体 / 列表）
+============================================================ */
+function fbarHTML(cntFn){
+  return `<span class="fbar">
+    <button class="fchip ${FACET==="all"?"on":""}" style="--fc:var(--muted)" data-act="facet" data-id="all">全部平台${cntFn?` · ${cntFn("all")}`:""}</button>
+    ${ACCTS.map(a=>`<button class="fchip ${FACET===a.id?"on":""}" style="--fc:var(${a.tk})" data-act="facet" data-id="${a.id}"><span class="dot"></span>${a.name}${cntFn?` · ${cntFn(a.id)}`:""}</button>`).join("")}
+  </span>`;
+}
+function podHTML(c,i,j){
+  const d=daysIn(c), od=overdue(c);
+  const appr=c.status==="审批中"&&c.approval
+    ?`<span class="tag dim">${c.approval.chain.filter(n=>n.result==="通过").length}/${c.approval.chain.length} 级已过</span>`:"";
+  return `<div class="pod" data-act="open-card" data-id="${c.id}" style="animation-delay:${(.15+i*.08+j*.1).toFixed(2)}s"
+    ${c.scheduleDate==="待定"?`title="⏳ 待定原因：${esc(pendReason(c))}"`:""}>
+    <div class="t">${esc(c.title)}</div>
+    <div class="m">
+      <span class="tag">${esc(colName(c.accountId,c.columnId))}</span>
+      ${FACET==="all"?acctTag(c.accountId):""}
+      ${c.scheduleDate==="待定"?`<span class="tag pend-tag">⏳ 排期待定</span>`:""}
+      ${appr}
+      <span class="tag ${od?"bad":"dim"}">${od?"⚠ 停留 "+d+" 天":"停留 "+d+" 天"}</span>
+    </div></div>`;
+}
+function listView(list){
+  return `<div class="panel table-panel"><table class="tbl">
+    <tr><th>标题</th><th>账号</th><th>栏目</th><th>状态</th><th>负责人</th><th>排期</th><th>停留</th></tr>
+    ${list.map(c=>`<tr data-act="open-card" data-id="${c.id}" style="cursor:pointer">
+      <td class="td-title">${esc(c.title)}</td><td>${acctName(c.accountId)}</td>
+      <td><span class="tag">${esc(colName(c.accountId,c.columnId))}</span></td>
+      <td>${stPill(c.status)}</td><td>${esc(c.owner)}</td>
+      <td>${c.scheduleDate==="待定"?`<span class="tag pend-tag">⏳ 待定</span>`:(c.scheduleDate||"—")}</td>
+      <td>${daysIn(c)} 天</td></tr>`).join("")||`<tr><td colspan="7" class="empty-cell">暂无选题</td></tr>`}
+  </table></div>`;
+}
+function viewPipe(){
+  const all=S.cards.filter(c=>inFacet(c.accountId));
+  const list=all.filter(c=>c.status!=="已搁置"&&qMatch(c));
+  const cnt=id=>id==="all"?all.filter(c=>c.status!=="已搁置").length:all.filter(c=>c.accountId===id&&c.status!=="已搁置").length;
+  const head=`<div class="pipe-head">
+    <span class="lab">按平台筛选</span>${fbarHTML(cnt)}
+    <div class="flex1"></div>
+    <div class="seg">
+      <button class="${MODE==="track"?"on":""}" data-act="mode" data-m="track">轨道视图</button>
+      <button class="${MODE==="list"?"on":""}" data-act="mode" data-m="list">列表视图</button>
+    </div>
+    <button class="btn" data-act="new-card">＋ 新建选题</button>
+    <span class="hint">${list.length} 个舱体在轨</span></div>`;
+  if(MODE==="list") return head+listView(list);
+  const kpis=[
+    ["在轨选题",list.length,"--cy",FACET==="all"?ACCTS.length+" 个平台 · 6 个阶段":"已筛选 · "+acctName(FACET)],
+    ["审批中",list.filter(c=>c.status==="审批中").length,"--pu","国寿 3 级链 · 瑞众 4 级链"],
+    ["超期预警",list.filter(overdue).length,"--bad","停留超过 7 天"],
+    ["排期待定",list.filter(c=>c.scheduleDate==="待定").length,"--warn","点击日历「待定区」可定位"]];
+  const pos=[3,22,41,60,79,97];
+  const track=`<div class="track-zone"><div class="track"></div><div class="shuttle"></div>
+    ${STATUSES.map((s,i)=>`<div class="station" style="left:${pos[i]}%;--sc:var(${STATUS_TOKEN[s]})">
+      <div class="num-tag">STAGE 0${i+1}</div><div class="name">${s}</div>
+      <div class="node" data-act="stage-info" data-st="${s}" title="点击查看该阶段"></div>
+      <div class="cnt">${list.filter(c=>c.status===s).length} POD</div></div>`).join("")}</div>`;
+  const pods=`<div class="pods">${STATUSES.map((s,i)=>{
+    const col=list.filter(c=>c.status===s);
+    return `<div class="pod-col" data-st="${s}" style="--sc:var(${STATUS_TOKEN[s]})">
+      ${col.map((c,j)=>podHTML(c,i,j)).join("")}
+      ${col.length?"":`<div class="empty-col">— 空 —</div>`}</div>`;}).join("")}</div>`;
+  return head+`<div class="kpis">${kpis.map(k=>`<div class="kpi" style="--ac:var(${k[2]})">
+    <div class="lab">${k[0]}</div><div class="num" data-n="${k[1]}">0</div><div class="sub">${k[3]}</div></div>`).join("")}</div>`
+    +track+pods;
+}
+
+/* ============================================================
+   视图 2：选题周报（PRD §5.2 · 档一人工触发，每栏目 ≥5 条）
+============================================================ */
+function wkItemHTML(rep,it,hist){
+  const handled=it.status!=="待处理";
+  const badge=it.status==="已采纳"?`<span class="tag ok">✓ 已采纳</span>`
+    :it.status==="观望"?`<span class="tag" style="color:var(--warn);border-color:var(--warn-line-2)">👀 观望中</span>`
+    :it.status==="忽略"?`<span class="tag dim">已忽略</span>`:"";
+  const canAdopt = hist ? it.status==="观望" : !handled;
+  return `<div class="wk-item ${handled?"handled":""}">
+    <div class="wk-title">${esc(it.title)}${it.sample?`<span class="tag dim">样例</span>`:""}${it.track?`<span class="tag" style="color:var(--pu);border-color:color-mix(in srgb,var(--pu) 40%,transparent)">🛰 ${esc(it.track)}</span>`:""}${it.method?`<span class="tag dim">🧩 ${esc(it.method)}</span>`:""}${it.evergreen?`<span class="tag dim">常青</span>`:""}${it.suggestDate?`<span class="tag" style="color:var(--warn);border-color:var(--warn-line)">📅 建议 ${esc(it.suggestDate)} 发布</span>`:""}${it.score?`<span class="tag ok">${"★".repeat(it.score)}${"☆".repeat(5-it.score)}</span>`:""}${it.trigger&&!it.method&&!it.track?`<span class="tag" style="color:var(--pu);border-color:color-mix(in srgb,var(--pu) 40%,transparent)">⚡ ${esc(it.trigger)}</span>`:""}${badge}</div>
+    ${it.scoreReason?`<div class="hint" style="margin:var(--sp-1) 0">${esc(it.scoreReason)}</div>`:""}
+    <div class="wk-grid">
+      <div class="wk-b"><div class="lab">① 热点是什么</div><div class="val">${esc(it.title)}</div></div>
+      <div class="wk-b"><div class="lab">② 热度数据</div><div class="val" style="color:var(--warn)">🔥 ${esc(it.heat)}</div></div>
+      <div class="wk-b"><div class="lab">③ 与品牌的关联</div><div class="val" style="color:var(--muted)">${esc(it.relation)}</div></div>
+      ${it.profile?`<div class="wk-b" style="grid-column:1/-1"><div class="lab">④ 采访对象画像（拿去向客户要人）</div><div class="val">${esc(it.profile)}</div></div>`
+        :`<div class="wk-b"><div class="lab">④ 创意方向</div><div class="val" style="color:var(--cy)">${esc(it.creative)}</div></div>`}
+      ${it.storyDir?`<div class="wk-b" style="grid-column:1/-1"><div class="lab">⑤ 故事方向</div><div class="val" style="color:var(--cy)">${esc(it.storyDir)}</div></div>`:""}
+    </div>
+    <div class="wk-act">
+      <button class="btn sm solid" data-act="adopt-open" data-item="${it.id}" ${canAdopt?"":"disabled style='opacity:.4'"}>✓ 采纳${hist?"（捞回）":""}</button>
+      <button class="btn sm ghost" data-act="wk-wait" data-item="${it.id}" ${handled?"disabled style='opacity:.4'":""}>👀 观望</button>
+      <button class="btn sm ghost" data-act="wk-ignore" data-item="${it.id}" ${handled?"disabled style='opacity:.4'":""}>忽略</button>
+      <div class="flex1"></div>
+      <button class="btn sm" data-act="copy-item" data-item="${it.id}">📋 复制卡片</button>
+    </div></div>`;
+}
+function findItem(itemId){ for(const r of S.reports){const i=r.items.find(x=>x.id===itemId);if(i)return{rep:r,it:i};} return null; }
+function itemText(rep,it){
+  if(it.handoffPrompt) return it.handoffPrompt;
+  const col=(S.columns[rep.accountId]||[]).find(c=>c.id===it.columnId);
+  const a=acct(rep.accountId);
+  return `【选题】${it.title}\n【热度】${it.heat}\n【栏目】${col?col.name:"未分配"}（${col?col.pos:""}）\n【品牌关联】${it.relation}\n【创意方向】${it.creative}\n【脚本生成提示】请为「${a.name}」写一条「${col?col.name:""}」栏目的短视频口播脚本：语气遵循栏目偏好「${col?col.pref:""}」，口语化、开头 3 秒钩子、时长约 45 秒、结尾引导互动；不点名竞品、不使用「稳赚」「保本」等违规表述。`;
+}
+function genWeekly(){
+  const targets=FACET==="all"?ACCTS.map(a=>a.id):[FACET];
+  targets.forEach(aid=>{
+    const cols=S.columns[aid]||[]; const items=[];
+    cols.forEach(col=>{
+      const pool=[...HOT_POOL].sort(()=>Math.random()-.5).slice(0,5);
+      pool.forEach(h=>{
+        const kw=col.keywords[Math.floor(Math.random()*col.keywords.length)]||col.name;
+        const tpl=CREATIVE_TPL[Math.floor(Math.random()*CREATIVE_TPL.length)];
+        items.push({id:uid(),columnId:col.id,title:h.t,heat:`${h.heat}（${h.src}）`,
+          relation:`该热点与「${col.name}」定位（${col.pos}）高度相关，可承接${brandOf(aid)}「保障 + 服务」的品牌叙事，自然植入专业形象。`,
+          creative:tpl.replaceAll("{kw}",kw),status:"待处理"});
+      });
+    });
+    S.reports=S.reports.filter(r=>!(r.accountId===aid&&r.week===weekLabel()));
+    S.reports.unshift({id:uid(),accountId:aid,week:weekLabel(),generatedAt:Date.now(),items});
+  });
+  save(); toast(`🗞 本周周报已生成（${targets.length} 个账号 · 每栏目 ≥5 条）`); render();
+}
+function viewWeekly(){
+  const wk=weekLabel();
+  const scope=FACET==="all"?ACCTS.map(a=>a.id):[FACET];
+  const cur=S.reports.filter(r=>r.week===wk&&scope.includes(r.accountId));
+  const hist=S.reports.filter(r=>r.week!==wk&&scope.includes(r.accountId)).sort((a,b)=>b.generatedAt-a.generatedAt);
+  const wkCount=id=>id==="all"
+    ?cur.reduce((s,r)=>s+r.items.length,0)
+    :(cur.find(r=>r.accountId===id)||{items:[]}).items.length;
+  let body=`<div class="vhead"><h2>选题周报</h2><span class="tag dim">${wk}</span>
+    <span class="hint">每栏目 ≥5 条 · 4 区块卡片 · 档一人工触发，档二起每周自动</span>
+    <div class="flex1"></div>
+    <button class="btn solid sm" data-act="gen-report">⚡ 生成本周周报</button></div>
+    <div class="pipe-head"><span class="lab">按平台筛选</span>${fbarHTML(wkCount)}</div>`;
+  if(!cur.length) return body+`<div class="panel empty-panel">本周周报尚未生成<br><span class="hint">点击右上角「生成本周周报」，将按各账号栏目关键词包 + 定位聚合热点选题</span></div>`;
+  cur.forEach(r=>{
+    body+=`<div class="col-h"><span class="tag" style="color:var(${acctTk(r.accountId)});border-color:color-mix(in srgb,var(${acctTk(r.accountId)}) 40%,transparent)">${acctName(r.accountId)}</span>
+      <span class="hint">生成于 ${fmtT(r.generatedAt)} · 共 ${r.items.length} 条 · 待处理 ${r.items.filter(i=>i.status==="待处理").length} 条</span></div>`;
+    (S.columns[r.accountId]||[]).forEach(col=>{
+      const items=r.items.filter(i=>i.columnId===col.id);
+      if(!items.length)return;
+      body+=`<details class="wk-fold" ${isMobile()?"":"open"}><summary>▎${esc(col.name)} <span class="tg">${items.length} 条</span></summary>
+        <div style="padding-top:var(--sp-2)">${items.map(it=>wkItemHTML(r,it,false)).join("")}</div></details>`;
+    });
+  });
+  if(hist.length){
+    body+=`<div class="col-h" style="color:var(--muted)">历史周报 <span class="hint">观望中的选题留在池内，跨期可捞回</span></div>`;
+    hist.forEach(r=>{
+      const wait=r.items.filter(i=>i.status==="观望").length;
+      body+=`<details class="panel hist"><summary>🗞 ${acctName(r.accountId)} · ${r.week} · ${r.items.length} 条（观望 ${wait} 条可捞回）</summary>
+        <div class="hist-body">${r.items.map(it=>wkItemHTML(r,it,true)).join("")}</div></details>`;
+    });
+  }
+  return body;
+}
+</script>
+
+<script>
+/* ============================================================
+   视图 3：排期日历（PRD §5.4 · 真实数据联动 + 待定区跳转）
+============================================================ */
+function viewCal(){
+  const base=new Date(); base.setDate(1); base.setMonth(base.getMonth()+calOffset);
+  const y=base.getFullYear(), m=base.getMonth();
+  const firstDow=(new Date(y,m,1).getDay()+6)%7;
+  const days=new Date(y,m+1,0).getDate();
+  const scope=S.cards.filter(c=>inFacet(c.accountId)&&c.status!=="已搁置"&&qMatch(c));
+  const pend=scope.filter(c=>c.scheduleDate==="待定");
+  const byDate={};
+  scope.filter(c=>c.scheduleDate&&c.scheduleDate!=="待定").forEach(c=>{(byDate[c.scheduleDate]=byDate[c.scheduleDate]||[]).push(c)});
+  const todayKey=fmtD(Date.now());
+  let cells=["一","二","三","四","五","六","日"].map(d=>`<div class="cal-dow">周${d}</div>`).join("");
+  for(let i=0;i<firstDow;i++)cells+=`<div class="cal-cell dim"></div>`;
+  for(let d=1;d<=days;d++){
+    const key=`${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+    const isToday=key===todayKey;
+    cells+=`<div class="cal-cell" style="${isToday?"border-color:var(--cy);box-shadow:var(--inset-cal)":""}">
+      <div class="d" style="${isToday?"color:var(--cy);font-weight:700":""}">${d}</div>
+      ${(byDate[key]||[]).map(c=>`<span class="chip" data-act="open-card" data-id="${c.id}"
+        style="background:color-mix(in srgb,var(${acctTk(c.accountId)}) 14%,transparent);color:var(${acctTk(c.accountId)});border-color:color-mix(in srgb,var(${acctTk(c.accountId)}) 40%,transparent)"
+        title="${esc(c.title)}">${esc(c.title)}</span>`).join("")}</div>`;
+  }
+  return `<div class="vhead"><h2>排期日历</h2>
+    <div class="seg">
+      <button data-act="cal-prev">‹ 上月</button>
+      <button data-act="cal-today" class="${calOffset===0?"on":""}">${y} 年 ${m+1} 月</button>
+      <button data-act="cal-next">下月 ›</button></div>
+    <div class="flex1"></div>${fbarHTML()}</div>
+    ${pend.length?`<div class="panel pend-panel"><h4>📌 待定区（${pend.length}）· 点击跳转流水线定位</h4>
+      <div class="pend-list">${pend.map(c=>`<span class="chip pend" data-act="pend-jump" data-id="${c.id}"
+        title="待定原因：${esc(pendReason(c))}">⏳ ${esc(c.title)}<span class="dim-txt"> · ${acctName(c.accountId)} · 在「${c.status}」</span></span>`).join("")}</div></div>`:""}
+    <div class="cal-grid">${cells}</div>`;
+}
+function jumpPend(id){
+  const c=getCard(id); if(!c)return;
+  if(!inFacet(c.accountId))FACET="all";
+  MODE="track"; clearHash(); CUR="pipe"; render();
+  setTimeout(()=>{
+    const el=document.querySelector(`.pod[data-id="${id}"]`);
+    if(el){el.scrollIntoView({behavior:"smooth",block:"center"});el.classList.add("flash");
+      setTimeout(()=>el.classList.remove("flash"),3200);}
+  },120);
+  toast(`⏳「${c.title}」当前在「${c.status}」· 待定原因：${pendReason(c)}`);
+}
+
+/* ============================================================
+   视图 4：归档库（PRD §5.7）  视图 5：栏目设置（PRD §5.6）
+============================================================ */
+function viewArch(){
+  const scope=S.cards.filter(c=>inFacet(c.accountId));
+  let list=scope.filter(c=>c.status==="已搁置"||c.status==="已发布");
+  if(archFilter.status!=="全部")list=list.filter(c=>c.status===archFilter.status);
+  if(archFilter.col!=="全部")list=list.filter(c=>c.columnId===archFilter.col);
+  if(archFilter.q)list=list.filter(c=>c.title.includes(archFilter.q));
+  const scopeIds=FACET==="all"?ACCTS.map(a=>a.id):[FACET];
+  const colOpts=[]; scopeIds.forEach(aid=>(S.columns[aid]||[]).forEach(c=>colOpts.push({id:c.id,label:acctName(aid)+" · "+c.name})));
+  return `<div class="vhead"><h2>归档库</h2>
+    <select data-af="status"><option ${archFilter.status==="全部"?"selected":""}>全部</option>
+      <option ${archFilter.status==="已搁置"?"selected":""}>已搁置</option>
+      <option ${archFilter.status==="已发布"?"selected":""}>已发布</option></select>
+    <select data-af="col"><option value="全部">全部栏目</option>
+      ${colOpts.map(o=>`<option value="${o.id}" ${archFilter.col===o.id?"selected":""}>${esc(o.label)}</option>`).join("")}</select>
+    <input placeholder="关键词检索…" value="${esc(archFilter.q)}" data-afq="1" style="width:180px">
+    <div class="flex1"></div><span class="hint">共 ${list.length} 条 · 已搁置可一键复活</span></div>
+    <div class="panel table-panel"><table class="tbl">
+      <tr><th>标题</th><th>账号</th><th>栏目</th><th>状态</th><th>发布日期</th><th>过程资产</th><th>操作</th></tr>
+      ${list.map(c=>`<tr>
+        <td class="td-title">${esc(c.title)}</td><td>${acctName(c.accountId)}</td>
+        <td><span class="tag">${esc(colName(c.accountId,c.columnId))}</span></td>
+        <td>${stPill(c.status)}</td><td>${c.publishDate||"—"}</td>
+        <td class="hint">快照 ${c.snapshot?1:0} · 链接 ${c.links.length} · 日志 ${c.logs.length}</td>
+        <td class="nowrap"><button class="btn sm ghost" data-act="open-card" data-id="${c.id}">查看</button>
+          ${c.status==="已搁置"?`<button class="btn sm solid" data-act="revive" data-id="${c.id}">↺ 复活</button>`:""}</td></tr>`).join("")
+        ||`<tr><td colspan="7" class="empty-cell">暂无归档选题</td></tr>`}
+    </table></div>`;
+}
+function viewCols(){
+  const aid=colAcct, bc=S.brandCards||{};
+  return `<div class="vhead"><h2>栏目设置</h2>
+    <span class="hint">栏目卡与品牌卡是周报生成的「配置源」：定位 / 画像 / 雷区 / 样例写得越具体，碰撞出的选题越准</span>
+    <div class="flex1"></div>
+    <button class="btn solid" data-act="save-cols">💾 保存配置</button></div>
+  <div class="sub-h">品牌调性卡</div>
+  ${["国寿","瑞众"].map(b=>{const c=bc[b]||{audience:"",tone:"",taboos:[]};
+    return `<div class="panel" style="margin-bottom:var(--sp-3)">
+      <div class="pipe-head" style="margin:0 0 var(--sp-3)"><strong style="font-size:var(--fs-md)">${b}</strong>
+        <span class="tag" style="color:var(${b==="国寿"?"--ac-gs":"--ac-rzdy"});border-color:color-mix(in srgb,var(${b==="国寿"?"--ac-gs":"--ac-rzdy"}) 40%,transparent)">${ACCTS.filter(a=>a.brand===b).map(a=>a.name).join(" / ")}</span></div>
+      <div class="row" style="gap:var(--sp-3);flex-wrap:wrap">
+        <div class="field" style="flex:1"><label>受众画像</label><input value="${esc(c.audience)}" data-bf="audience" data-brand="${b}"></div>
+        <div class="field" style="flex:1"><label>品牌调性</label><input value="${esc(c.tone)}" data-bf="tone" data-brand="${b}"></div>
+        <div class="field" style="flex:1.4"><label>红线（分号分隔，生成时硬排除）</label><input value="${esc((c.taboos||[]).join("；"))}" data-bf="taboos" data-brand="${b}"></div>
+      </div></div>`;}).join("")}
+  <div class="sub-h">全局节点日历 <span class="hint">系统共享信号（品牌无关），生成时自动扫描未来 60 天，由碰撞决定是否契合某栏目</span></div>
+  <div class="panel" style="margin-bottom:var(--sp-3)">
+    ${SYS_NODES.length?SYS_NODES.map(n=>`<span class="tag" style="color:var(--warn);border-color:var(--warn-line);margin:0 var(--sp-2) var(--sp-2) 0">📆 ${n.date} ${n.name}（${n.days} 天后）</span>`).join(""):`<span class="hint">未来 60 天无节点，选题将全部来自当日热榜信号碰撞</span>`}
+  </div>
+  <div class="vhead" style="margin-top:var(--sp-5)"><div class="seg">${ACCTS.map(a=>`<button class="${a.id===aid?"on":""}" data-act="col-acct" data-id="${a.id}">${a.name}</button>`).join("")}</div>
+    <div class="flex1"></div>
+    <button class="btn" data-act="add-col">＋ 新增栏目</button></div>
+  ${(S.columns[aid]||[]).map((c,i)=>`<div class="panel" style="margin-bottom:var(--sp-3)">
+    <div class="pipe-head" style="margin:0 0 var(--sp-3)"><strong style="font-size:var(--fs-md)">栏目 ${i+1}</strong>
+      <span class="tag ${c.ctype==="story"?"ok":"dim"}">${c.ctype==="story"?"◆ 故事型（找人）":"● 热点型"}</span>
+      <div class="flex1"></div>
+      <button class="btn sm ghost danger" data-act="del-col" data-id="${c.id}">删除</button></div>
+    <div class="row" style="gap:var(--sp-3);flex-wrap:wrap">
+      <div class="field" style="width:180px"><label>栏目名</label><input value="${esc(c.name)}" data-colf="name" data-colid="${c.id}"></div>
+      <div class="field" style="flex:1"><label>定位描述</label><input value="${esc(c.pos)}" data-colf="pos" data-colid="${c.id}"></div>
+      <div class="field" style="width:130px"><label>栏目类型</label>
+        <select data-colf="ctype" data-colid="${c.id}">
+          <option value="hot" ${c.ctype!=="story"?"selected":""}>热点型</option>
+          <option value="story" ${c.ctype==="story"?"selected":""}>故事型（找人）</option></select></div>
+      <div class="field" style="width:150px"><label>生成模式</label>
+        <select data-colf="genMode" data-colid="${c.id}">
+          <option value="weekly" ${c.genMode!=="calendar"&&c.genMode!=="project"?"selected":""}>周报制</option>
+          <option value="calendar" ${c.genMode==="calendar"?"selected":""}>日历驱动</option>
+          <option value="project" ${c.genMode==="project"?"selected":""}>项目制·专项</option></select></div>
+      <div class="field" style="flex:1"><label>关键词包（逗号分隔）</label><input value="${esc((c.keywords||[]).join("，"))}" data-colf="keywords" data-colid="${c.id}"></div>
+      <div class="field" style="flex:1"><label>选题偏好</label><input value="${esc(c.pref)}" data-colf="pref" data-colid="${c.id}"></div>
+    </div>
+    ${c.genMode==="project"?`<div class="hint" style="margin-bottom:var(--sp-3)">🔒 项目制栏目走「专项模式」手动触发，不进周报生成（专项看板即将上线）</div>`:""}
+    ${c.ctype==="story"?`<div class="field"><label>找人画像维度（恒定的「选人提问模板」；具体的人是每次生成的产出）</label><input value="${esc(c.findProfile)}" data-colf="findProfile" data-colid="${c.id}"></div>`:""}
+    <div class="field"><label>雷区（分号分隔，生成时硬排除）</label><input value="${esc((c.taboos||[]).join("；"))}" data-colf="taboosJoin" data-colid="${c.id}"></div>
+    <div class="field"><label>定义卡全文（注入生成引擎的 {{栏目定义卡}}；轨道/子系列/心智句等自定义规则写在这里，改卡不改码）</label>
+      <textarea rows="6" data-colf="cardMd" data-colid="${c.id}">${esc(c.cardMd||"")}</textarea></div>
+    <div class="row" style="gap:var(--sp-3);align-items:flex-start">
+      <div class="field" style="flex:1"><label>✅ 好样例选题</label><textarea rows="2" data-colf="goodSample" data-colid="${c.id}">${esc(c.goodSample)}</textarea></div>
+      <div class="field" style="flex:1"><label>❌ 坏样例选题</label><textarea rows="2" data-colf="badSample" data-colid="${c.id}">${esc(c.badSample)}</textarea></div>
+    </div></div>`).join("")}`;
+}
+</script>
+
+<script>
+/* ============================================================
+   卡片详情抽屉（PRD §5.3 · 交接口 B + 审批痕迹 + 溯源快照）
+============================================================ */
+function openDrawer(id){ drawerId=id;
+  document.getElementById("drawer").classList.add("open");
+  document.getElementById("drawer-mask").classList.add("open"); renderDrawer(); }
+function closeDrawer(){ drawerId=null;
+  document.getElementById("drawer").classList.remove("open");
+  document.getElementById("drawer-mask").classList.remove("open"); }
+function renderDrawer(){
+  const c=getCard(drawerId); if(!c){closeDrawer();return;}
+  const curIdx=STATUSES.indexOf(c.status), shelved=c.status==="已搁置";
+  const steps=STATUSES.map((st,i)=>{
+    const cls=shelved?"":i<curIdx?"done":i===curIdx?"cur":"";
+    return `<div class="step ${cls}" ${shelved?"":`data-act="step" data-st="${st}"`} title="${shelved?"已封存":"点击流转到「"+st+"」"}">
+      <div class="n">${i<curIdx&&!shelved?"✓":i+1}</div><div class="s">${st}</div></div>`;}).join("");
+  let apprHTML="";
+  if(c.approval){
+    const pi=c.approval.chain.findIndex(n=>!n.result);
+    apprHTML=`<div class="sec"><h4>审批痕迹 · ${brandOf(c.accountId)} ${c.approval.chain.length} 级链（第 ${c.approval.round} 轮）</h4>
+      ${c.approval.chain.map((n,i)=>{
+        const cls=n.result==="通过"?"pass":n.result==="驳回"?"fail":(i===pi&&c.status==="审批中")?"pending":"";
+        const stat=n.result?stPill(n.result):(i===pi&&c.status==="审批中")?`<span class="tag" style="color:var(--cy);border-color:var(--cy-line-2)">待审批</span>`:`<span class="tag dim">等待中</span>`;
+        return `<div class="appr-node ${cls}"><div class="appr-row">
+          <span class="who">${i+1}. ${esc(n.name)}</span>${stat}
+          ${n.time?`<span class="hint">${fmtT(n.time)}</span>`:""}</div>
+          ${n.comment?`<div class="appr-cmt">💬 ${esc(n.comment)}</div>`:""}
+          ${i===pi&&c.status==="审批中"?`<div class="row" style="margin-top:var(--sp-3)">
+            <input id="appr-comment" placeholder="审批意见（可选）…" style="flex:1">
+            <button class="btn sm solid" data-act="approve">✓ 通过</button>
+            <button class="btn sm ghost danger" data-act="reject">✕ 驳回</button></div>`:""}
+        </div>`;}).join("")}
+      <div class="hint" style="margin-top:var(--sp-3)">客户/上级意见经微信反馈，由内部人员代录到对应节点（PRD §4.3）</div></div>`;
+  }
+  document.getElementById("drawer").innerHTML=`
+    <div class="drawer-head"><strong>选题卡片详情</strong><span class="hint">ID ${c.id} · ${c.source}</span>
+      <div class="flex1"></div><button class="btn sm ghost" data-act="close-drawer">✕ 关闭</button></div>
+    <div style="font-size:var(--fs-xl);font-weight:700;line-height:1.5;margin-top:var(--sp-4)">${esc(c.title)}</div>
+    <div style="display:flex;gap:var(--sp-2);margin-top:var(--sp-2);flex-wrap:wrap">
+      <span class="tag">${esc(colName(c.accountId,c.columnId))}</span>${acctTag(c.accountId)}${stPill(c.status)}
+      ${shelved?`<span class="tag" style="color:var(--warn);border-color:var(--warn-line-2)">已封存于归档库</span>`:""}</div>
+    <div class="steps">${steps}</div>
+    <div class="hint" style="text-align:center;margin-bottom:var(--sp-2)">${shelved?"已搁置，复活后可继续流转":`点击步骤可手动流转（兜底）· 当前停留 ${daysIn(c)} 天`}</div>
+    <div class="row" style="margin-bottom:var(--sp-2)">
+      ${shelved?`<button class="btn solid" style="flex:1" data-act="revive" data-id="${c.id}">↺ 复活回看板</button>`
+        :`<button class="btn ghost danger" style="flex:1" data-act="shelve" data-id="${c.id}">🗄 搁置此选题（保留全部资产）</button>`}
+    </div>
+    <div class="sec"><h4>基础信息</h4>
+      <div class="row" style="gap:var(--sp-3)">
+        <div class="field" style="flex:1;margin:0"><label>负责人</label>
+          <input data-cf="owner" value="${esc(c.owner)}"></div>
+        <div class="field" style="flex:1;margin:0"><label>预计发布日期</label>
+          <div class="row"><input type="date" data-cf="schedDate" value="${c.scheduleDate&&c.scheduleDate!=="待定"?c.scheduleDate:""}" style="flex:1" ${c.scheduleDate==="待定"?"disabled":""}>
+            <label class="tbd"><input type="checkbox" data-cf="schedTbd" ${c.scheduleDate==="待定"?"checked":""}>待定</label></div></div>
+      </div>
+      ${c.adoptNote?`<div class="kv" style="margin-top:var(--sp-2)"><span class="k">采纳想法</span><span>${esc(c.adoptNote)}</span></div>`:""}
+      ${c.scheduleDate==="待定"?`<div class="kv" style="margin-top:var(--sp-2)"><span class="k">待定原因</span><span>${esc(pendReason(c))}</span></div>`:""}
+    </div>
+    <div class="sec"><h4>终稿载体（交接口 B）</h4>
+      ${c.links.map(l=>`<div class="link-row">
+        <span class="tag" style="color:var(--link);border-color:var(--link-line)">${esc(l.type)}</span>
+        <a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.url)}</a>
+        <span class="hint">${fmtD(l.addedAt)}</span></div>`).join("")
+      ||`<div class="hint" style="margin-bottom:var(--sp-2)">暂无链接 — 外部 AI 成稿 / 分秒针成片在此回填挂载</div>`}
+      <div class="row" style="margin-top:var(--sp-3)">
+        <select id="link-type">${LINK_TYPES.map(t=>`<option>${t}</option>`).join("")}</select>
+        <input id="link-url" placeholder="粘贴 URL…" style="flex:1">
+        <button class="btn sm solid" data-act="add-link">＋ 添加最终链接</button></div>
+    </div>
+    ${apprHTML}
+    ${c.snapshot?`<div class="sec"><details class="snap"><summary>📎 来源快照（溯源起点 · 不可编辑）</summary>
+      <div class="kv" style="margin-top:var(--sp-2)">
+        ${c.snapshot.url?`<span class="k">原始链接</span><a href="${esc(c.snapshot.url)}" target="_blank" rel="noopener">${esc(c.snapshot.url)}</a>`:""}
+        <span class="k">抓取热度</span><span>${esc(c.snapshot.heat)}</span>
+        <span class="k">品牌关联</span><span>${esc(c.snapshot.relation)}</span>
+        <span class="k">创意方向</span><span>${esc(c.snapshot.creative)}</span></div></details></div>`:""}
+    <div class="sec"><h4>操作日志（倒序）</h4>
+      ${c.logs.map(l=>`<div class="log-item"><span class="time">${fmtT(l.time)}</span><span><strong>${esc(l.who)}</strong> ${esc(l.action)}</span></div>`).join("")
+      ||`<div class="hint">暂无记录</div>`}</div>
+    <div class="row" style="margin-top:var(--sp-3)">
+      <button class="btn ghost" style="flex:1" data-act="copy-card" data-id="${c.id}">📋 复制卡片给外部 AI（交接口 A）</button></div>`;
+}
+function cardText(c){
+  if(c.handoffPrompt) return c.handoffPrompt;
+  const a=acct(c.accountId), col=(S.columns[c.accountId]||[]).find(x=>x.id===c.columnId);
+  return `【选题】${c.title}\n【栏目】${col?col.name:"未分配"}（${col?col.pos:""}）\n【账号】${a.name}\n${c.snapshot?`【热度】${c.snapshot.heat}\n【品牌关联】${c.snapshot.relation}\n【创意方向】${c.snapshot.creative}\n`:""}${c.adoptNote?`【想法备注】${c.adoptNote}\n`:""}【脚本生成提示】请为「${a.name}」写一条「${col?col.name:""}」栏目的短视频口播脚本：语气遵循栏目偏好「${col?col.pref:""}」，口语化、开头 3 秒钩子、时长约 45 秒、结尾引导互动；不点名竞品、不使用「稳赚」「保本」等违规表述。`;
+}
+
+/* ============================================================
+   弹窗：采纳三字段 / 新建选题 / 客户汇报 / 登录人 / 重置
+============================================================ */
+function openModal(html){ document.getElementById("modal-box").innerHTML=html;
+  document.getElementById("modal-mask").classList.add("open"); }
+function closeModal(){ document.getElementById("modal-mask").classList.remove("open"); }
+
+function adoptModal(itemId){
+  const f=findItem(itemId); if(!f)return;
+  const {rep,it}=f;
+  const cols=S.columns[rep.accountId]||[];
+  openModal(`<h3>✓ 采纳选题</h3>
+    <div class="adopt-title">${esc(it.title)}</div>
+    <div class="hint" style="margin:var(--sp-2) 0 var(--sp-4)">🔥 ${esc(it.heat)} · 将在星轨流水线「待筛选」生成卡片，来源快照自动保留</div>
+    <div class="field"><label>① 选择栏目 / 系列</label>
+      <select id="ad-col">${cols.map(c=>`<option value="${c.id}" ${c.id===it.columnId?"selected":""}>${esc(c.name)}</option>`).join("")}</select></div>
+    <div class="field"><label>② 想法备注</label><input id="ad-note" placeholder="结合产品做软植入、注意口径…"></div>
+    <div class="field"><label>③ 预计发布日期（可勾「待定」）</label>
+      <div class="row"><input type="date" id="ad-date" style="flex:1">
+        <label class="tbd"><input type="checkbox" id="ad-tbd">待定</label></div></div>
+    <div class="modal-actions"><button class="btn ghost" data-act="close-modal">取消</button>
+      <button class="btn solid" data-act="adopt-confirm" data-item="${itemId}">确认采纳</button></div>`);
+}
+function adoptConfirm(itemId){
+  const f=findItem(itemId); if(!f)return;
+  const {rep,it}=f;
+  const tbd=document.getElementById("ad-tbd").checked;
+  const card={id:uid().slice(0,6).toUpperCase(),title:it.title,accountId:rep.accountId,
+    columnId:document.getElementById("ad-col").value,owner:S.user,createdAt:Date.now(),
+    source:"热点抓取",scheduleDate:tbd?"待定":(document.getElementById("ad-date").value||null),
+    publishDate:null,status:"待筛选",statusEnteredAt:Date.now(),
+    snapshot:{url:"",heat:it.heat,relation:it.relation,creative:it.creative},
+    adoptNote:document.getElementById("ad-note").value,links:[],approval:null,logs:[],
+    pendNote:tbd?document.getElementById("ad-note").value:"",
+    handoffPrompt:it.handoffPrompt||"",method:it.method||"",track:it.track||""};
+  addLog(card,"采纳周报选题，卡片自动生成");
+  S.cards.unshift(card); it.status="已采纳"; save(); closeModal();
+  toast(`✓ 已采纳，看板「待筛选」已生成卡片 ${card.id}`); render();
+}
+function newCardModal(){
+  const defAcct=FACET!=="all"?FACET:ACCTS[0].id;
+  openModal(`<h3>＋ 新建选题</h3>
+    <div class="field"><label>选题标题</label><input id="nc-title" placeholder="一句话说清选题…"></div>
+    <div class="row" style="gap:var(--sp-3)">
+      <div class="field" style="flex:1"><label>账号</label>
+        <select id="nc-acct">${ACCTS.map(a=>`<option value="${a.id}" ${a.id===defAcct?"selected":""}>${a.name}</option>`).join("")}</select></div>
+      <div class="field" style="flex:1"><label>栏目 / 系列</label>
+        <select id="nc-col">${(S.columns[defAcct]||[]).map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join("")}</select></div>
+    </div>
+    <div class="field"><label>负责人</label><input id="nc-owner" value="${esc(S.user)}"></div>
+    <div class="field"><label>预计发布日期（可勾「待定」）</label>
+      <div class="row"><input type="date" id="nc-date" style="flex:1">
+        <label class="tbd"><input type="checkbox" id="nc-tbd">待定</label></div></div>
+    <div class="modal-actions"><button class="btn ghost" data-act="close-modal">取消</button>
+      <button class="btn solid" data-act="create-confirm">创建选题</button></div>`);
+}
+function createConfirm(){
+  const title=document.getElementById("nc-title").value.trim();
+  if(!title){toast("请填写选题标题",true);return;}
+  const tbd=document.getElementById("nc-tbd").checked;
+  const card={id:uid().slice(0,6).toUpperCase(),title,accountId:document.getElementById("nc-acct").value,
+    columnId:document.getElementById("nc-col").value,owner:document.getElementById("nc-owner").value||S.user,
+    createdAt:Date.now(),source:"人工创建",scheduleDate:tbd?"待定":(document.getElementById("nc-date").value||null),
+    publishDate:null,status:"待筛选",statusEnteredAt:Date.now(),snapshot:null,adoptNote:"",
+    links:[],approval:null,logs:[],pendNote:tbd?"手动新建，档期待确认":""};
+  addLog(card,"手动新建选题");
+  S.cards.unshift(card); save(); closeModal();
+  toast(`＋ 选题已创建：${card.id}`); render();
+}
+function repListHTML(brand){
+  const list=S.cards.filter(c=>brandOf(c.accountId)===brand&&c.status!=="已搁置");
+  if(!list.length)return `<div class="hint">该品牌暂无可汇报选题</div>`;
+  return list.map(c=>`<label class="rep-item"><input type="checkbox" value="${c.id}">
+    <span class="rt">${esc(c.title)}</span>${stPill(c.status)}<span class="tag">${acctName(c.accountId)}</span></label>`).join("");
+}
+function reportModal(){
+  const brands=[...new Set(ACCTS.map(a=>a.brand))];
+  if(!brands.includes(repBrand)) repBrand=brands[0];
+  openModal(`<h3>⚡ 生成客户汇报链接</h3>
+    <div class="field"><label>品牌（汇报页按品牌隔离，不混排其他品牌数据）</label>
+      <select id="rep-brand">${brands.map(b=>`<option ${b===repBrand?"selected":""}>${b}</option>`).join("")}</select></div>
+    <div class="field"><label>勾选本品牌选题（只读页展示标题 / 栏目 / 阶段 / 排期与创意方向）</label>
+      <div id="rep-list" class="rep-list">${repListHTML(repBrand)}</div></div>
+    <div class="modal-actions"><button class="btn ghost" data-act="close-modal">取消</button>
+      <button class="btn solid" data-act="generate-report">生成只读汇报页</button></div>`);
+}
+function generateReport(){
+  const ids=[...document.querySelectorAll("#rep-list input:checked")].map(x=>x.value);
+  if(!ids.length){toast("请至少勾选一个选题",true);return;}
+  const r={id:uid(),brand:repBrand,cardIds:ids,createdAt:Date.now()};
+  S.clientReports.unshift(r); save();
+  const url=location.origin+location.pathname+"#report="+r.id;
+  openModal(`<h3>✅ 汇报页已生成</h3>
+    <div class="field"><label>客户链接（免密即开 · 复制后发给客户）</label><input id="rep-url" readonly value="${url}"></div>
+    <div class="hint" style="margin-bottom:var(--sp-3)">页面含品牌抬头 / 新选题与创意方向 / 各选题进展 / 排期表；不暴露内部讨论、审批细节与其他品牌数据。意见经微信回流、内部代录。</div>
+    <div class="modal-actions"><button class="btn" data-act="copy-report-link">📋 复制链接</button>
+      <button class="btn solid" data-act="preview-report" data-id="${r.id}">👁 客户视角预览</button></div>`);
+}
+function userModal(){
+  openModal(`<h3>👤 登录人</h3>
+    <div class="field"><label>当前登录人（记录到操作日志「谁做的」）</label>
+      <input id="user-name" value="${esc(S.user)}"></div>
+    <div class="modal-actions"><button class="btn ghost" data-act="close-modal">取消</button>
+      <button class="btn solid" data-act="user-save">保存</button></div>`);
+}
+function resetModal(){
+  openModal(`<h3>↺ 重置演示数据</h3>
+    <div class="hint" style="margin-bottom:var(--sp-4)">将清空本机全部数据（选题 / 周报 / 汇报链接），恢复到种子演示状态。此操作不可撤销。</div>
+    <div class="modal-actions"><button class="btn ghost" data-act="close-modal">取消</button>
+      <button class="btn solid" data-act="reset-confirm">确认重置</button></div>`);
+}
+function configModal(){
+  api("/config").then(c=>{
+    openModal(`<h3>⚙ 服务配置</h3>
+      <div class="row" style="margin-bottom:var(--sp-4);flex-wrap:wrap;gap:var(--sp-2)">
+        <span class="pill" style="color:var(${c.mode==="mock"?"--warn":c.mode==="live"?"--ok":"--soft"});border-color:color-mix(in srgb,var(${c.mode==="mock"?"--warn":c.mode==="live"?"--ok":"--soft"}) 45%,transparent)">
+          生成模式：${c.mode==="mock"?"链路验证":c.mode==="live"?"真实碰撞":"未配置"}</span>
+        <span class="pill" style="color:var(${c.llmKey?"--ok":"--soft"});border-color:var(${c.llmKey?"--ok-line":"--line-2"})">
+          DeepSeek Key：${c.keyMasked||"未配置"}</span>
+      </div>
+      <div class="field"><label>DeepSeek API Key（platform.deepseek.com 获取；仅存服务端 server/.env，页面只显示打码）</label>
+        <input id="cfg-key" type="password" placeholder="sk-…" autocomplete="off"></div>
+      <div class="hint" style="margin-bottom:var(--sp-3)">保存后立即生效，无需重启服务；配置后「生成本周周报」即为真实碰撞。清除 Key 后回到链路验证模式。</div>
+      <div class="field" style="margin-top:var(--sp-4);padding-top:var(--sp-4);border-top:1px dashed var(--line)">
+      <label>行业互动率基准（%，用于数据看板对比虚线；金融蓝 V 实测均值可从企业号后台「同行业对比」或蝉妈妈行业版获取）</label>
+      <div class="row"><input id="bench-rate" type="number" step="0.1" min="0" max="100" value="${S.bench?S.bench.rate:3.5}" style="width:120px">
+        <input id="bench-label" value="${esc(S.bench?S.bench.label:"")}" placeholder="来源标注，如：金融蓝V均值" style="flex:1"></div></div>
+    <div class="modal-actions">
+        ${c.llmKey?`<button class="btn ghost danger" data-act="config-clear">清除 Key</button>`:""}
+        <button class="btn ghost" data-act="export-demo">⬇ 导出离线演示版</button>
+        <button class="btn ghost" data-act="bench-save">保存基准</button>
+        <button class="btn ghost" data-act="close-modal">关闭</button>
+        <button class="btn solid" data-act="config-save">保存 Key</button></div>`);
+  }).catch(e=>toast("读取配置失败："+e.message,true));
+}
+function doReset(){
+  localStorage.removeItem(LS_KEY); S=migrate(seedState());
+  if(online){ api("/state",{method:"PUT",body:JSON.stringify({reset:true,state:S})}).then(d=>{stateVersion=d.version;}).catch(()=>{}); }
+  else save();
+  FACET="all"; MODE="track"; calOffset=0; drawerId=null; searchQ="";
+  archFilter={status:"全部",col:"全部",q:""};
+  document.getElementById("search").value="";
+  closeModal(); closeDrawer(); render(); toast("↺ 演示数据已重置");
+}
+</script>
+
+<script>
+/* ---------- 周报生成（服务端碰撞）---------- */
+async function runGenerate(){
+  const btn=document.querySelector('[data-act="gen-report"]');
+  const old=btn?btn.innerHTML:"";
+  if(btn){btn.disabled=true;btn.textContent="⏳ 逐栏目碰撞中…（全部账号约 1-3 分钟，请勿关闭）";}
+  try{
+    const d=await api("/generate",{method:"POST",body:JSON.stringify({accountId:FACET==="all"?null:FACET})});
+    stateVersion=d.version; S=d.state;
+    CUR="weekly"; render();
+    toast(`🗞 周报已生成 ${d.count} 条选题${d.mock?"（链路验证模式）":""}${d.fromFallback?" · 部分信号源降级":""} —— 已替换未处理条目，已采纳/观望保留；每次生成都会碰撞出新选题`);
+  }catch(e){ toast("生成失败："+e.message,true); }
+  finally{ if(btn){btn.disabled=false;btn.innerHTML=old;} }
+}
+
+/* ---------- 客户汇报页（hash 路由只读页 · 信息隔离）---------- */
+function renderClient(id){
+  const r=S.clientReports.find(x=>x.id===id);
+  const el=document.getElementById("view");
+  if(!r){el.innerHTML=`<div class="panel empty-panel">汇报不存在或已被清理<br><br><button class="btn" data-act="exit-report">← 返回工作台</button></div>`;return;}
+  const cards=r.cardIds.map(getCard).filter(Boolean);
+  const fresh=cards.filter(c=>c.status==="待筛选"||c.status==="已立项");
+  const sched=cards.filter(c=>c.scheduleDate&&c.scheduleDate!=="待定")
+    .sort((a,b)=>a.scheduleDate<b.scheduleDate?-1:1);
+  el.innerHTML=`<div class="client">
+    <div class="client-head">
+      <div><div class="c-brand" style="color:var(--cy)">${r.brand} · 内容进展汇报</div>
+        <div class="hint">生成于 ${fmtT(r.createdAt)} · ${cards.length} 个选题 · 只读页面</div></div>
+      <div class="flex1"></div>
+      <button class="btn ghost sm" data-act="exit-report">← 返回工作台</button>
+    </div>
+    ${fresh.length?`<div class="sec"><h4>本期新选题（含创意方向）</h4>
+      ${fresh.map(c=>`<div class="c-item"><strong>${esc(c.title)}</strong>
+        <span class="tag">${esc(colName(c.accountId,c.columnId))}</span>
+        <div class="hint">创意方向：${esc(c.snapshot?c.snapshot.creative:"—")}</div></div>`).join("")}</div>`:""}
+    <div class="sec"><h4>各选题当前进展</h4><table class="tbl">
+      <tr><th>标题</th><th>栏目</th><th>平台</th><th>当前阶段</th><th>预计排期</th><th>提报 / 成片</th></tr>
+      ${cards.map(c=>`<tr><td class="td-title">${esc(c.title)}</td><td>${esc(colName(c.accountId,c.columnId))}</td>
+        <td>${acctName(c.accountId)}</td><td>${stPill(c.status)}</td>
+        <td>${c.scheduleDate==="待定"?"待定":(c.scheduleDate||"待排")}</td>
+        <td>${clientLinkBtns(c)}</td></tr>`).join("")}
+    </table></div>
+    ${sched.length?`<div class="sec"><h4>排期表</h4><table class="tbl">
+      <tr><th>日期</th><th>标题</th><th>平台</th></tr>
+      ${sched.map(c=>`<tr><td>${c.scheduleDate}</td><td class="td-title">${esc(c.title)}</td><td>${acctName(c.accountId)}</td></tr>`).join("")}
+    </table></div>`:""}
+    <div class="client-foot">— 如有意见请通过微信反馈对接人 —</div>
+  </div>`;
+}
+function clearHash(){ if(location.hash) history.replaceState(null,"",location.pathname+location.search); }
+function route(){
+  const m=location.hash.match(/^#report=([\w-]+)$/);
+  if(m){ document.body.classList.add("client-mode"); CUR="pipe"; renderClient(m[1]); }
+  else { document.body.classList.remove("client-mode"); render(); }
+}
+
+/* ============================================================
+   视图 6：数据看板（趋势优先 · 纯 SVG 图表 · 参照抖音运营指标体系）
+   指标依据：播放量=流量趋势看环比；互动率=互动量÷播放量；
+   完播率/涨粉暂无数据源（标注缺口）
+============================================================ */
+const fmtW = v => v>=1e8 ? (v/1e8).toFixed(1)+"亿" : v>=1e4 ? Math.round(v/1e4)+"w" : String(Math.round(v||0));
+function _pct(a,b){ return b?Math.round((a-b)/b*100):null; }
+function _arr(v){ if(v===null||v===undefined||!isFinite(v)) return "";
+  return `<tspan style="fill:var(${v>=0?"--bad":"--ok"})">${v>=0?"▲":"▼"}${Math.abs(v)}%</tspan>`; }
+function _svgFrame(W,H,L,R,T,B,grid,fmtY){
+  let g="";
+  grid.forEach(gd=>{ const y=gd[1];
+    g+=`<line x1="${L}" y1="${y.toFixed(1)}" x2="${W-R}" y2="${y.toFixed(1)}" style="stroke:var(--line)"/>`+
+       `<text x="${L-8}" y="${(y+4).toFixed(1)}" text-anchor="end" style="fill:var(--soft);font-size:var(--fs-2xs)">${fmtY?fmtY(gd[0]):gd[0]}</text>`; });
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">${g}`;
+}
+function _chartPlays(M,mode){
+  const W=840,H=300,L=58,R=18,T=34,B=44,n=M.length;
+  if(n<2) return `<div class="panel" style="text-align:center;color:var(--soft)">数据不足</div>`;
+  const vals=M.map(m=>m.plays);
+  const xs=i=>L+(W-L-R)*i/(n-1);
+  let ymap,grid;
+  if(mode==="log"){
+    const lo=Math.floor(Math.log10(Math.min(...vals))),hi=Math.ceil(Math.log10(Math.max(...vals)))+0.2;
+    ymap=v=>T+(H-T-B)*(1-(Math.log10(Math.max(v,1))-lo)/(hi-lo));
+    grid=[];for(let p=lo;p<=hi;p++)grid.push([Math.pow(10,p),ymap(Math.pow(10,p)),fmtW(Math.pow(10,p))]);
+  }else{
+    const hi=Math.max(...vals)*1.18;
+    ymap=v=>T+(H-T-B)*(1-v/hi);
+    grid=[0,1,2,3,4].map(i=>[hi*i/4,ymap(hi*i/4),fmtW(hi*i/4)]);
+  }
+  const pts=M.map((m,i)=>[xs(i),ymap(m.plays)]);
+  let svg=_svgFrame(W,H,L,R,T,B,grid,fmtW);
+  svg+=`<path d="${pts.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+","+p[1].toFixed(1)).join(" ")} L ${pts[n-1][0].toFixed(1)},${(H-B)} L ${pts[0][0].toFixed(1)},${(H-B)} Z" style="fill:color-mix(in srgb,var(--cy) 10%,transparent);stroke:none"/>`;
+  svg+=`<polyline points="${pts.map(p=>p[0].toFixed(1)+","+p[1].toFixed(1)).join(" ")}" style="fill:none;stroke:var(--cy);stroke-width:2.5"/>`;
+  M.forEach((m,i)=>{
+    const [x,y]=pts[i];
+    svg+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.5" style="fill:var(--bg);stroke:var(--cy);stroke-width:2"/>`;
+    svg+=`<text x="${x.toFixed(1)}" y="${(y-9).toFixed(1)}" text-anchor="middle" style="fill:var(--ink);font-size:var(--fs-2xs);font-weight:600">${fmtW(m.plays)}</text>`;
+    if(i>0){ const p=_pct(m.plays,M[i-1].plays);
+      svg+=`<text x="${x.toFixed(1)}" y="${(H-B+13).toFixed(1)}" text-anchor="middle" style="font-size:var(--fs-2xs)">${_arr(p)}</text>`; }
+    svg+=`<text x="${x.toFixed(1)}" y="${(H-B+28).toFixed(1)}" text-anchor="middle" style="fill:var(--soft);font-size:var(--fs-2xs)">${m.k.slice(2).replace("-","/")}</text>`;
+  });
+  return svg+`</svg>`;
+}
+function _chartRate(M,avg,bench){
+  const W=840,H=300,L=52,R=18,T=30,B=36,n=M.length;
+  if(n<2) return `<div class="panel" style="text-align:center;color:var(--soft)">数据不足</div>`;
+  const vals=M.map(m=>m.rate);
+  const hi=Math.max(...vals,avg)*1.25, lo=Math.min(...vals,avg)*0.7;
+  const xs=i=>L+(W-L-R)*i/(n-1);
+  const ymap=v=>T+(H-T-B)*(1-(v-lo)/(hi-lo));
+  let svg=_svgFrame(W,H,L,R,T,B,[2,3,4,5,6].filter(v=>v<=hi&&v>=lo).map(v=>[v,ymap(v),v+"%"]));
+  const yavg=ymap(avg);
+  svg+=`<line x1="${L}" y1="${yavg.toFixed(1)}" x2="${W-R}" y2="${yavg.toFixed(1)}" style="stroke:var(--warn);stroke-dasharray:5 4"/>`;
+  svg+=`<text x="${W-R}" y="${(yavg-6).toFixed(1)}" text-anchor="end" style="fill:var(--warn);font-size:var(--fs-2xs)">全期均值 ${avg.toFixed(1)}%</text>`;
+  if(bench&&bench.rate>lo&&bench.rate<hi){
+    const yb=ymap(bench.rate);
+    svg+=`<line x1="${L}" y1="${yb.toFixed(1)}" x2="${W-R}" y2="${yb.toFixed(1)}" style="stroke:var(--link);stroke-dasharray:2 4"/>`;
+    svg+=`<text x="${L+4}" y="${(yb-6).toFixed(1)}" style="fill:var(--link);font-size:var(--fs-2xs)">${bench.label||"行业基准"} ${bench.rate}%</text>`;
+  }
+  const pts=M.map((m,i)=>[xs(i),ymap(m.rate)]);
+  svg+=`<polyline points="${pts.map(p=>p[0].toFixed(1)+","+p[1].toFixed(1)).join(" ")}" style="fill:none;stroke:var(--ok);stroke-width:2.5"/>`;
+  M.forEach((m,i)=>{
+    const [x,y]=pts[i];
+    svg+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.5" style="fill:var(--bg);stroke:var(--ok);stroke-width:2"/>`;
+    svg+=`<text x="${x.toFixed(1)}" y="${(y-9).toFixed(1)}" text-anchor="middle" style="fill:var(--ink);font-size:var(--fs-2xs);font-weight:600">${m.rate.toFixed(1)}%</text>`;
+    svg+=`<text x="${x.toFixed(1)}" y="${(H-B+22).toFixed(1)}" text-anchor="middle" style="fill:var(--soft);font-size:var(--fs-2xs)">${m.k.slice(2).replace("-","/")}</text>`;
+  });
+  return svg+`</svg>`;
+}
+function _chartMix(M){
+  const W=840,H=240,L=20,R=52,T=30,B=36,n=M.length;
+  if(n<2) return `<div class="panel" style="text-align:center;color:var(--soft)">数据不足</div>`;
+  const bw=Math.min(46,(W-L-R)/n*0.6);
+  const segs=[["likes","点赞","--cy"],["comments","评论","--pu"],["shares","转发","--link"],["favors","收藏","--ok"]];
+  let svg=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">`;
+  M.forEach((m,i)=>{
+    const x=L+(W-L-R)*i/(n-1)-bw/2; let y=T; const tot=m.inter||1;
+    segs.forEach(s=>{
+      const h=(H-T-B)*(m[s[0]]/tot);
+      svg+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" style="fill:var(${s[2]})"><title>${m.k} ${s[1]} ${(m[s[0]]/tot*100).toFixed(1)}%</title></rect>`;
+      if(m[s[0]]/tot>0.09) svg+=`<text x="${(x+bw/2).toFixed(1)}" y="${(y+h/2+4).toFixed(1)}" text-anchor="middle" style="fill:var(--on-accent);font-size:var(--fs-2xs)">${Math.round(m[s[0]]/tot*100)}%</text>`;
+      y+=h;
+    });
+    svg+=`<text x="${(x+bw/2).toFixed(1)}" y="${(T-10).toFixed(1)}" text-anchor="middle" style="fill:var(--warn);font-size:var(--fs-2xs)">评论+转发 ${Math.round((m.comments+m.shares)/tot*100)}%</text>`;
+    svg+=`<text x="${(x+bw/2).toFixed(1)}" y="${(H-B+22).toFixed(1)}" text-anchor="middle" style="fill:var(--soft);font-size:var(--fs-2xs)">${m.k.slice(2).replace("-","/")}</text>`;
+  });
+  return svg+`</svg>`;
+}
+function _chartFans(AM){
+  const n=AM.length; if(n<2) return `<div class="panel" style="text-align:center;color:var(--soft)">数据不足</div>`;
+  const W=840,H=280,L=58,R=18,T=34,B=46;
+  const vals=AM.map(r=>r.totalFans);
+  const lo=Math.min(...vals)*0.94, hi=Math.max(...vals)*1.02;
+  const t0=new Date(AM[0].date).getTime(), t1=new Date(AM[n-1].date).getTime();
+  const x=d=>L+(W-L-R)*((new Date(d).getTime()-t0)/(t1-t0));
+  const y=v=>T+(H-T-B)*(1-(v-lo)/(hi-lo));
+  const grid=[0,1,2,3].map(i=>{const v=Math.round(lo+(hi-lo)*i/3);return [v,y(v),fmtW(v)];});
+  let svg=_svgFrame(W,H,L,R,T,B,grid,fmtW);
+  const pts=AM.map(r=>[x(r.date),y(r.totalFans)]);
+  svg+=`<path d="${pts.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+","+p[1].toFixed(1)).join(" ")} L ${pts[n-1][0].toFixed(1)},${(H-B)} L ${pts[0][0].toFixed(1)},${(H-B)} Z" style="fill:color-mix(in srgb,var(--ok) 10%,transparent);stroke:none"/>`;
+  svg+=`<polyline points="${pts.map(p=>p[0].toFixed(1)+","+p[1].toFixed(1)).join(" ")}" style="fill:none;stroke:var(--ok);stroke-width:2.5"/>`;
+  // 月末标注：粉丝量 + 当月净增
+  const byM={}; AM.forEach(r=>{(byM[r.date.slice(0,7)]=byM[r.date.slice(0,7)]||[]).push(r);});
+  Object.keys(byM).sort().forEach(k=>{
+    const list=byM[k], last=list[list.length-1];
+    const net=list.reduce((s,r)=>s+r.netFans,0);
+    const px=x(last.date), py=y(last.totalFans);
+    svg+=`<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="3.5" style="fill:var(--bg);stroke:var(--ok);stroke-width:2"/>`;
+    svg+=`<text x="${px.toFixed(1)}" y="${(py-10).toFixed(1)}" text-anchor="middle" style="fill:var(--ink);font-size:var(--fs-2xs);font-weight:600">${fmtW(last.totalFans)}</text>`;
+    svg+=`<text x="${px.toFixed(1)}" y="${(H-B+14).toFixed(1)}" text-anchor="middle" style="fill:var(--ok);font-size:var(--fs-2xs)">+${fmtW(net)}</text>`;
+    svg+=`<text x="${px.toFixed(1)}" y="${(H-B+30).toFixed(1)}" text-anchor="middle" style="fill:var(--soft);font-size:var(--fs-2xs)">${k.slice(2).replace("-","/")}</text>`;
+  });
+  return svg+`</svg>`;
+}
+function viewData(){
+  const m=S.metrics;
+  if(!m||!m.rows||!m.rows.length) return `<div class="vhead"><h2>数据看板</h2></div><div class="panel empty-panel">${demoMode?"📦 离线演示版不含作品数据——在线正式版将展示四组趋势图：月度播放 / 互动率 / 互动结构 / 粉丝增长":"暂无作品数据（账号后台作品数据由服务端导入）"}</div>`;
+  const rows=m.rows, pub=rows.filter(r=>!r.note.includes("私密"));
+  const I=r=>(r.likes||0)+(r.comments||0)+(r.shares||0)+(r.favors||0);
+  const mm={};
+  rows.forEach(r=>{ if(!r.date)return; const k=r.date.slice(0,7);
+    (mm[k]=mm[k]||{plays:0,inter:0,likes:0,comments:0,shares:0,favors:0});
+    mm[k].plays+=r.plays; mm[k].inter+=I(r); mm[k].likes+=r.likes; mm[k].comments+=r.comments;
+    mm[k].shares+=r.shares; mm[k].favors+=r.favors; });
+  const M=Object.keys(mm).sort().map(k=>Object.assign({k,rate:mm[k].plays?mm[k].inter/mm[k].plays*100:0},mm[k]));
+  const eff=pub.filter(r=>r.plays>=1000);
+  const effInter=eff.reduce((s,r)=>s+I(r),0), effPlays=eff.reduce((s,r)=>s+r.plays,0);
+  const avgRate=effPlays?effInter/effPlays*100:0;
+  const top2share=(()=>{const tp=rows.reduce((s,r)=>s+r.plays,0);if(!tp)return 0;
+    const s2=[...rows].sort((a,b)=>b.plays-a.plays);return Math.round(s2.slice(0,2).reduce((s,r)=>s+r.plays,0)/tp*100);})();
+  // 近30天 vs 前30天（以最近数据日为锚点，避免月末空窗失真）
+  const lastD=rows.map(r=>r.date).filter(Boolean).sort().pop();
+  const day=(o)=>o.toISOString().slice(0,10);
+  const e1=day(new Date(lastD));
+  const d30=day(new Date(new Date(lastD).getTime()-30*86400000)), d60=day(new Date(new Date(lastD).getTime()-60*86400000));
+  const w1=pub.filter(r=>r.date>d30&&r.date<=e1), w2=pub.filter(r=>r.date>d60&&r.date<=d30);
+  const sum=(a,f)=>a.reduce((s,r)=>s+f(r),0);
+  const p1=sum(w1,r=>r.plays), p2=sum(w2,r=>r.plays);
+  const i1=sum(w1,I), i2=sum(w2,I);
+  const r1=p1?i1/p1*100:0, r2=p2?i2/p2*100:0;
+  const AM=(S.accountMetrics&&S.accountMetrics.rows)||[];
+  const aLast=AM.length?AM[AM.length-1]:null;
+  const aW1=AM.filter(r=>aLast&&r.date>day(new Date(new Date(aLast.date).getTime()-30*86400000))&&r.date<=aLast.date);
+  const aW2=AM.filter(r=>aLast&&r.date>day(new Date(new Date(aLast.date).getTime()-60*86400000))&&r.date<=day(new Date(new Date(aLast.date).getTime()-30*86400000)));
+  const f1=aW1.reduce((s,r)=>s+r.netFans,0), f2=aW2.reduce((s,r)=>s+r.netFans,0);
+  const fTotal=aLast?aLast.totalFans:0, fStart=AM.length?AM[0].totalFans:0;
+  const kp=(a,b)=>b?Math.round((a-b)/b*100):null;
+  const arw=v=>v===null?"—":(v>=0?"▲":"▼")+Math.abs(v)+"%";
+  const kpis=[
+    {lab:"近30天"+(acct(m.account).platform==="小红书"?"观看":"播放"),val:fmtW(p1),ac:"--cy",sub:`${arw(kp(p1,p2))} vs 前30天`},
+    {lab:"近30天互动率",val:r1.toFixed(2)+"%",ac:"--ok",sub:`${r2?(r1-r2>=0?"+":"")+(r1-r2).toFixed(1)+"pt":"—"} vs 前30天`}];
+  if(AM.length>=2){
+    kpis.push({lab:"近30天净增粉",val:"+"+fmtW(Math.max(f1,0)),ac:"--ok",sub:`${arw(kp(Math.max(f1,1),Math.max(f2,1)))} vs 前30天`});
+    kpis.push({lab:"粉丝总量",val:fmtW(fTotal),ac:"--warn",sub:`较期初 +${fmtW(fTotal-fStart)}（+${fStart?Math.round((fTotal-fStart)/fStart*100):0}%）`});
+  }
+  const hist=(m.history||[]);
+  const snapLine= hist.length>=2?(()=>{const h=hist[hist.length-1],prev=h[hist.length-2];const d=h.plays-prev.plays;
+      return `<span class="tag ok" style="border-color:var(--ok-line)">⏱ ${h.date} 快照：较前一快照 ${d>=0?"+":""}${fmtW(d)} 播放</span>`;})()
+    : hist.length===1?`<span class="tag" style="color:var(--warn);border-color:var(--warn-line)">⏱ 已记录 1 次日快照（${hist[0].date}）——下次导入后出现日增量对比</span>`:"";
+  const recent=M.slice(-8);
+  const norm=recent.length?recent.reduce((s,x)=>s+x.plays,0)/recent.length:0;
+  const rateTail=M.slice(-2).every(x=>x.rate<avgRate);
+  return `<div class="vhead"><h2>数据看板</h2>
+    <span class="tag dim">${acctName(m.account)}</span>
+    <span class="hint">月度趋势 · 指标口径：互动率=互动量÷${acct(m.account).platform==="小红书"?"观看量":"播放量"}（行业 3-5% 及格、5%+ 优质）</span></div>
+  <div class="panel" style="padding:var(--sp-3) var(--sp-4);margin-bottom:var(--sp-3);display:flex;gap:var(--sp-3);align-items:center;flex-wrap:wrap">
+    ${demoMode?`<span class="tag" style="color:var(--warn);border-color:var(--warn-line)">📦 离线演示版 · 数据存本机浏览器</span>`
+    :`<span class="tag ok" style="border-color:var(--ok-line)">● 自动更新已开启</span>
+    <span class="hint">收件箱每 30 分钟巡检${INBOX_STATUS_LAST?` · 上次巡检 ${INBOX_STATUS_LAST}`:""} · 待处理文件 ${INBOX_PENDING} 个 · 每天把创作者中心导出的 Excel 丢进 server/inbox/ 即自动入库</span>`}
+    ${snapLine}</div>
+  <div class="kpis">${kpis.map(k=>`<div class="kpi" style="--ac:var(${k.ac})">
+    <div class="lab">${k.lab}</div><div class="num" style="font-size:var(--fs-xl)">${k.val}</div><div class="sub">${k.sub}</div></div>`).join("")}</div>
+
+  <div class="sub-h">① 流量趋势：月度${acct(m.account).platform==="小红书"?"观看":"播放"} <span class="hint">${dChart==="log"?"对数轴：爆款月与常态月同图可比，点下方面为环比":"近 8 个月常态期：看月度波动与拐点"}</span></div>
+  <div class="panel">
+    <div class="row" style="margin-bottom:var(--sp-3)"><div class="seg">
+      <button class="${dChart==="log"?"on":""}" data-act="dchart" data-m="log">全期（对数轴）</button>
+      <button class="${dChart==="recent"?"on":""}" data-act="dchart" data-m="recent">近 8 个月（线性）</button></div>
+      <div class="flex1"></div>
+      <span class="hint">常态期月均 ${fmtW(norm)}；11-12 月为爆款月（TOP2 贡献全账号 62% 播放）</span></div>
+    ${_chartPlays(dChart==="recent"?recent:M,dChart==="recent"?"lin":"log")}
+    <div class="insight"><span class="ic">◆</span><span><strong>结论：</strong>声量由爆款驱动（TOP2 占全年 ${top2share}%）；常态期月均 ${fmtW(norm)}${(()=>{const best=recent.reduce((a,b)=>b.plays>a.plays?b:a);return `，常态期内峰值 ${best.k} 达 ${fmtW(best.plays)}`;})()}——复制已验证的爆款形态、打造第二条爆款曲线，是拉流量的核心杠杆。</span></div></div>
+
+  <div class="duo"><div>
+  <div class="sub-h">② 内容质量：互动率趋势 <span class="hint">${rateTail?"⚠ 近两月互动率均低于全期均值——内容吸引力回落信号":"互动率在均值附近波动"}</span></div>
+  <div class="panel">${_chartRate(M,avgRate,S.bench)}
+    <div class="insight"><span class="ic">◆</span><span><strong>结论：</strong>全期均值 ${avgRate.toFixed(1)}%，基准线（${S.bench?(S.bench.label+" "+S.bench.rate+"%"):"3.5%"}）可在 ⚙ 服务配置中校准为金融蓝 V 实测均值；峰值 ${(M.reduce((a,b)=>b.rate>a.rate?b:a)).rate.toFixed(1)}% 出现在 ${(M.reduce((a,b)=>b.rate>a.rate?b:a)).k}，${rateTail?"近两月连续跌破基准与均值——优先复盘选题钩子与开头 3 秒的留人能力":"当前维持在均值上方，内容质量稳定"}。</span></div></div>
+  </div><div>
+  <div class="sub-h">③ 互动结构演变：点赞 / 评论 / 转发 / 收藏 <span class="hint">柱顶为「评论+转发」占比——引发讨论与传播的高价值互动信号</span></div>
+  <div class="panel">
+    <div class="row" style="gap:var(--sp-4);margin-bottom:var(--sp-2);flex-wrap:wrap">
+      ${[["点赞","--cy"],["评论","--pu"],["转发","--link"],["收藏","--ok"]].map(l=>`<span class="hint"><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:var(${l[1]});margin-right:var(--sp-2)"></span>${l[0]}</span>`).join("")}
+      <div class="flex1"></div><span class="hint">每根柱 = 该月互动总量按 100% 拆分</span></div>
+    ${_chartMix(M)}
+    <div class="insight"><span class="ic">◆</span><span><strong>结论：</strong>日常点赞占比 80-90%，讨论度偏低；${(()=>{const c=M.reduce((a,b)=>(b.comments+b.shares)/(b.inter||1)>(a.comments+a.shares)/(a.inter||1)?b:a);return c.k+" 评论+转发占比 "+Math.round((c.comments+c.shares)/(c.inter||1)*100)+"% 为全年峰值——该月出现了真正引发讨论的内容，值得复刻其选题形态";})()}。</span></div></div>
+  </div></div>
+
+  ${AM.length>=2?`<div class="sub-h">④ 账号增长：粉丝量与净增 <span class="hint">主页访问 ${fmtW(AM.reduce((s,r)=>s+r.visits,0))} 次 · 封面点击率均值 ${(AM.reduce((s,r)=>s+r.coverCtr,0)/AM.length).toFixed(2)}%</span></div>
+  <div class="panel">${_chartFans(AM)}
+    <div class="insight"><span class="ic">◆</span><span><strong>结论：</strong>粉丝 ${fmtW(fStart)} → ${fmtW(fTotal)}（+${fStart?Math.round((fTotal-fStart)/fStart*100):0}%，月月正增长）；<strong>涨粉与播放量并不同步</strong>——${AM[0].date.slice(0,7)} 播放 ${fmtW((()=>{const a=AM.filter(r=>r.date.startsWith(AM[0].date.slice(0,7)));return a.reduce((s,r)=>s+r.plays,0);})())} 仅涨粉 ${fmtW(Math.max((()=>{const a=AM.filter(r=>r.date.startsWith(AM[0].date.slice(0,7)));return a.reduce((s,r)=>s+r.netFans,0);})(),0))}，而 ${(()=>{const byM={};AM.forEach(r=>{(byM[r.date.slice(0,7)]=byM[r.date.slice(0,7)]||{p:0,f:0});byM[r.date.slice(0,7)].p+=r.plays;byM[r.date.slice(0,7)].f+=r.netFans;});return Object.entries(byM).sort((a,b)=>b[1].f-a[1].f)[0];})()[0]} 播放相近却涨粉 ${fmtW((()=>{const byM={};AM.forEach(r=>{(byM[r.date.slice(0,7)]=byM[r.date.slice(0,7)]||{f:0});byM[r.date.slice(0,7)].f+=r.netFans;});return Math.max(...Object.values(byM).map(v=>v.f));})())}——把选题从「被看见」做成「值得关注」才是增长引擎；取关 26/07 升至 ${fmtW((()=>{const a=AM.filter(r=>r.date.startsWith("2026-07"));return a.reduce((s,r)=>s+r.unfollows,0);})())} 需留意。</span></div></div>`:""}
+
+  <div class="hint" style="margin-top:var(--sp-3)">数据缺口：完播率 / 平均播放时长暂未在导出模板中——补充导出列后此看板自动扩展（粉丝与主页访问已接入：2026年数据汇总）</div`;
+}
+
+/* ============================================================
+   路由 / 渲染 / KPI 数字滚动
+============================================================ */
+const VIEW={pipe:viewPipe,weekly:viewWeekly,cal:viewCal,arch:viewArch,cols:viewCols,data:viewData};
+function renderChrome(){
+  const badge=document.getElementById("acct-badge");
+  badge.textContent=(FACET==="all"?"全部平台":acctName(FACET))+" ▾";
+  badge.style.color=FACET==="all"?"":`var(${acctTk(FACET)})`;
+  badge.style.borderColor=FACET==="all"?"":`color-mix(in srgb,var(${acctTk(FACET)}) 45%,transparent)`;
+  document.getElementById("user-chip").textContent="👤 "+S.user;
+  document.querySelectorAll("[data-act=nav]").forEach(b=>b.classList.toggle("on",b.dataset.v===CUR));
+}
+function countUp(){
+  document.querySelectorAll(".num").forEach(el=>{
+    const n=+el.dataset.n;let t0=null;
+    function step(t){if(!t0)t0=t;const p=Math.min((t-t0)/900,1);
+      el.textContent=Math.round(n*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(step)}
+    requestAnimationFrame(step)});
+}
+function render(){
+  renderChrome();
+  document.getElementById("view").innerHTML=`<div class="view">${VIEW[CUR]()}</div>`;
+  if(CUR==="pipe"&&MODE==="track")countUp();
+  if(drawerId&&getCard(drawerId))renderDrawer();
+}
+
+/* ============================================================
+   全局事件委托
+============================================================ */
+document.addEventListener("click",e=>{
+  const t=e.target.closest("[data-act]");
+  if(!t){
+    if(e.target.id==="modal-mask")closeModal();
+    return;
+  }
+  const id=t.dataset.id||t.dataset.item||t.dataset.v, act=t.dataset.act;
+  switch(act){
+    case "nav": CUR=t.dataset.v; clearHash(); render();
+      if(!document.body.classList.contains("nav-pin")) document.body.classList.remove("nav-open");
+      break;
+    case "nav-pin":{ const pinned=document.body.classList.toggle("nav-pin");
+      if(!pinned) document.body.classList.remove("nav-open");
+      const pb=document.getElementById("pin-btn");
+      if(pb) pb.textContent=pinned?"✓ 已固定常驻":"📌 固定常驻";
+      try{localStorage.setItem("xg_navpin",pinned?"1":"0")}catch(e){}
+      toast(pinned?"📌 导航已固定常驻（再次点击恢复悬停模式）":"导航已切回悬停模式：鼠标移开自动收起"); break; }
+    case "facet": FACET=(FACET===id)?"all":id; render();
+      toast(FACET==="all"?"已显示全部平台":`已筛选：${acctName(FACET)}（再点一次取消）`); break;
+    case "facet-clear": if(FACET!=="all"){FACET="all";render();toast("已显示全部平台");} break;
+    case "mode": MODE=t.dataset.m; render(); break;
+    case "stage-info":{ const n=S.cards.filter(c=>inFacet(c.accountId)&&c.status===t.dataset.st&&c.status!=="已搁置").length;
+      toast(`🛰 STAGE「${t.dataset.st}」· ${n} POD 在轨`); break; }
+    case "open-card": openDrawer(id); break;
+    case "close-drawer": closeDrawer(); break;
+    case "step":{ const c=getCard(drawerId); if(!c)break;
+      if(t.dataset.st!==c.status){ setStatus(c,t.dataset.st); render(); renderDrawer(); toast(`已流转至「${t.dataset.st}」`); }
+      break; }
+    case "approve": approveNode(drawerId); break;
+    case "reject": rejectNode(drawerId); break;
+    case "shelve": shelveCard(id); break;
+    case "revive": reviveCard(id); break;
+    case "add-link":{ const c=getCard(drawerId); if(!c)break;
+      const url=document.getElementById("link-url").value.trim();
+      if(!url){toast("请粘贴链接 URL",true);break;}
+      const type=document.getElementById("link-type").value;
+      c.links.push({type,url,addedAt:Date.now()});
+      addLog(c,`添加最终链接（${type}）`); save(); render(); renderDrawer();
+      toast("🔗 终稿链接已挂载（交接口 B）"); break; }
+    case "copy-card":{ const c=getCard(id||drawerId); if(c)copyText(cardText(c)); break; }
+    case "copy-item":{ const f=findItem(id); if(f)copyText(itemText(f.rep,f.it)); break; }
+    case "adopt-open": adoptModal(id); break;
+    case "adopt-confirm": adoptConfirm(id); break;
+    case "wk-wait":{ const f=findItem(id); if(f){f.it.status="观望";save();render();toast("👀 已标记观望，留在选题池（跨期可捞回）");} break; }
+    case "wk-ignore":{ const f=findItem(id); if(f){f.it.status="忽略";save();render();toast("已忽略");} break; }
+    case "gen-report": online ? runGenerate() : genWeekly(); break;
+    case "dchart": dChart=t.dataset.m; render(); break;
+    case "new-card": newCardModal(); break;
+    case "create-confirm": createConfirm(); break;
+    case "cal-prev": calOffset--; render(); break;
+    case "cal-next": calOffset++; render(); break;
+    case "cal-today": calOffset=0; render(); break;
+    case "pend-jump": jumpPend(id); break;
+    case "col-acct": colAcct=id; render(); break;
+    case "add-col":{ S.columns[colAcct].push({id:uid(),name:"新栏目",pos:"",keywords:[],pref:""});
+      save(); render(); toast("＋ 已新增栏目，填写后记得保存"); break; }
+    case "del-col":{ S.columns[colAcct]=S.columns[colAcct].filter(c=>c.id!==id); save(); render(); toast("栏目已删除"); break; }
+    case "save-cols": save(); toast("💾 栏目配置已保存，将驱动下次周报生成"); break;
+    case "report-open": reportModal(); break;
+    case "generate-report": generateReport(); break;
+    case "copy-report-link":{ const v=document.getElementById("rep-url").value; copyText(v); break; }
+    case "preview-report": closeModal(); location.hash="report="+id; route(); break;
+    case "exit-report": clearHash(); route(); break;
+    case "user-edit": userModal(); break;
+    case "user-save":{ const v=document.getElementById("user-name").value.trim();
+      if(v){S.user=v;save();closeModal();render();toast("👤 登录人已更新，后续日志将记录为新名称");} break; }
+    case "reset-ask": resetModal(); break;
+    case "reset-confirm": doReset(); break;
+    case "config-open": configModal(); break;
+    case "export-demo": { const a=document.createElement("a"); a.href="/api/export-demo"; a.download="";
+      document.body.appendChild(a); a.click(); a.remove();
+      toast("⬇ 离线演示版已生成，开始下载（单文件，发给谁都能双击打开）"); break; }
+    case "config-save": (async()=>{ const k=document.getElementById("cfg-key").value.trim();
+      if(!k){toast("请输入 DeepSeek API Key",true);return;}
+      try{ await api("/config/key",{method:"POST",body:JSON.stringify({key:k})});
+        toast("🔑 Key 已保存，生成模式切换为「真实碰撞」"); configModal(); }
+      catch(e){ toast("保存失败："+e.message,true); } })(); break;
+    case "bench-save":{ const v=parseFloat(document.getElementById("bench-rate").value);
+      if(!(v>0&&v<=100)){toast("请输入 0-100 之间的互动率百分数",true);break;}
+      S.bench={rate:Math.round(v*10)/10,label:document.getElementById("bench-label").value.trim()||"行业基准"};
+      save(); closeModal(); render(); toast(`📐 行业基准已更新：${S.bench.label} ${S.bench.rate}%`); break; }
+    case "config-clear": (async()=>{ try{ await api("/config/key",{method:"POST",body:JSON.stringify({clear:true})});
+        toast("已清除 Key，回到链路验证模式"); configModal(); }
+      catch(e){ toast("操作失败："+e.message,true); } })(); break;
+    case "close-modal": closeModal(); break;
+  }
+});
+document.addEventListener("change",e=>{
+  const el=e.target;
+  if(el.id==="rep-brand"){ repBrand=el.value;
+    document.getElementById("rep-list").innerHTML=repListHTML(repBrand); return; }
+  if(el.id==="nc-acct"){ const cols=S.columns[el.value]||[];
+    document.getElementById("nc-col").innerHTML=cols.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join(""); return; }
+  if(el.dataset.af==="status"){ archFilter.status=el.value==="全部"?"全部":el.value; render(); return; }
+  if(el.dataset.af==="col"){ archFilter.col=el.value; render(); return; }
+  if(el.dataset.afq!==undefined){ archFilter.q=el.value.trim(); render(); return; }
+  const cf=el.dataset.cf;
+  if(cf){ const c=getCard(drawerId); if(!c)return;
+    if(cf==="owner"){ c.owner=el.value; }
+    else if(cf==="schedTbd"){
+      if(el.checked){ c.scheduleDate="待定"; if(!c.pendNote)c.pendNote=c.adoptNote||"档期待确认"; }
+      else { c.scheduleDate=null; c.pendNote=""; }
+    }
+    else if(cf==="schedDate"&&c.scheduleDate!=="待定"){ c.scheduleDate=el.value||null; }
+    save(); render(); renderDrawer(); return; }
+  const bf=el.dataset.bf;
+  if(bf){ const b=el.dataset.brand; if(!S.brandCards[b])S.brandCards[b]={audience:"",tone:"",taboos:[]};
+    if(bf==="taboos"){ S.brandCards[b].taboos=el.value.split(/[；;]/).map(s=>s.trim()).filter(Boolean); }
+    else S.brandCards[b][bf]=el.value;
+    save(); return; }
+  const colf=el.dataset.colf;
+  if(colf){ const col=(S.columns[colAcct]||[]).find(x=>x.id===el.dataset.colid); if(!col)return;
+    if(colf==="keywords"){ col.keywords=el.value.split(/[，,]/).map(s=>s.trim()).filter(Boolean); }
+    else if(colf==="taboosJoin"){ col.taboos=el.value.split(/[；;]/).map(s=>s.trim()).filter(Boolean); }
+    else col[colf]=el.value;
+    save(); return; }
+});
+document.addEventListener("input",e=>{
+  if(e.target.id==="search"){ searchQ=e.target.value.trim().toLowerCase(); render(); }
+});
+window.addEventListener("hashchange",route);
+
+/* ---------- 悬停导航抽屉（桌面）+ 底部 Tab（移动）---------- */
+const isMobile=()=>matchMedia("(max-width:640px)").matches;
+(function(){
+  const edge=document.getElementById("edgezone"), dn=document.getElementById("drawer-nav");
+  if(!edge||!dn) return;
+  let navT=null;
+  const open=()=>{clearTimeout(navT);
+    if(!document.body.classList.contains("nav-pin")) document.body.classList.add("nav-open");};
+  const sched=()=>{clearTimeout(navT);
+    navT=setTimeout(()=>{if(!document.body.classList.contains("nav-pin"))document.body.classList.remove("nav-open")},280);};
+  edge.addEventListener("mouseenter",open);
+  edge.addEventListener("mouseleave",sched);
+  dn.addEventListener("mouseenter",open);
+  dn.addEventListener("mouseleave",sched);
+  try{ if(localStorage.getItem("xg_navpin")==="1"){ document.body.classList.add("nav-pin");
+    const pb=document.getElementById("pin-btn"); if(pb) pb.textContent="✓ 已固定常驻"; } }catch(e){}
+})();
+
+/* ---------- 星空粒子 / 时钟 ---------- */
+const cv=document.getElementById("stars"),cx=cv.getContext("2d");
+const CY=tok("--cy");
+let W,H,ps=[];
+function rs(){W=cv.width=innerWidth;H=cv.height=innerHeight;
+  ps=Array.from({length:60},()=>({x:Math.random()*W,y:Math.random()*H,v:.12+Math.random()*.3,r:.6+Math.random()*1.3,o:.12+Math.random()*.35}))}
+rs();addEventListener("resize",rs);
+(function loop(){cx.clearRect(0,0,W,H);
+  ps.forEach(p=>{p.y-=p.v;if(p.y<-4){p.y=H+4;p.x=Math.random()*W}
+    cx.globalAlpha=p.o;cx.fillStyle=CY;cx.beginPath();cx.arc(p.x,p.y,p.r,0,7);cx.fill()});
+  cx.globalAlpha=1;requestAnimationFrame(loop)})();
+function clockTick(){const d=new Date();
+  const el=document.getElementById("clock");
+  if(el)el.textContent=d.toLocaleDateString("zh-CN")+" "+d.toLocaleTimeString("zh-CN",{hour12:false})}
+clockTick();setInterval(clockTick,1000);
+
+/* ---------- 初始化 ---------- */
+bootState();
+</script>
+</body>
+</html>
